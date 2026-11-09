@@ -1,0 +1,25 @@
+{
+  "name": "money-tracker",
+  "version": "1.0.0",
+  "description": "Money Tracker 是一套使用 JavaScript、Node.js、\r Express 與 SQLite 開發的個人財務管理網頁系統。",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chiou-Jiakang/Money-Tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Chiou-Jiakang/Money-Tracker/issues"
+  },
+  "homepage": "https://github.com/Chiou-Jiakang/Money-Tracker#readme",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
