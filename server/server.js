@@ -1,12 +1,16 @@
 const express = require("express");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 讓伺服器能夠解析 JSON 格式的請求
+// 解析 JSON 格式的請求
 app.use(express.json());
 
-// 第一個 API：檢查伺服器是否正常運作
+// 提供 public 資料夾中的前端靜態檔案
+app.use(express.static(path.join(__dirname, "../public")));
+
+// API：檢查伺服器是否正常運作
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
