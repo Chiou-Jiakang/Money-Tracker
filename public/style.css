@@ -76,3 +76,115 @@ section p {
     padding: 20px;
   }
 }
+
+/* ===== 財務摘要卡片 ===== */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.summary-card {
+  background: #0f172a;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 0;
+}
+
+.summary-card h3 {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.summary-card .amount {
+  margin: 0 0 12px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.summary-card span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* 收入、支出與收支淨額的顏色 */
+.summary-card .income {
+  color: #4ade80;
+}
+
+.summary-card .expense {
+  color: #fb7185;
+}
+
+.summary-card .balance {
+  color: #38bdf8;
+}
+
+/* 平板尺寸：改為兩欄 */
+@media (max-width: 900px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 手機尺寸：改為一欄 */
+@media (max-width: 600px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== 最近交易紀錄 ===== */
+
+.transactions-section {
+  margin-top: 28px;
+}
+
+.section-heading h2 {
+  margin-bottom: 4px;
+}
+
+.section-heading p {
+  margin-top: 0;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 24px;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.transactions-table th,
+.transactions-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.transactions-table th {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.transactions-table td {
+  font-size: 14px;
+}
+
+.empty-state {
+  color: var(--muted);
+  text-align: center;
+  padding: 36px 16px !important;
+}

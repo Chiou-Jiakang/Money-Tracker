@@ -6,17 +6,73 @@
     <title>Money Tracker｜個人財務管理系統</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
+
   <body>
+    <!-- 網站標題 -->
     <header>
       <h1>Money Tracker</h1>
       <p>個人財務管理系統</p>
     </header>
 
     <main>
-      <section>
+      <!-- 財務總覽 -->
+      <section class="dashboard">
         <h2>財務總覽 Dashboard</h2>
-        <p>歡迎使用 Money Tracker！</p>
-        <p>未來將在這裡顯示收入、支出與財務統計。</p>
+        <p>查看個人收入、支出與財務狀況。</p>
+
+        <!-- 財務摘要卡片 -->
+        <div class="summary-grid">
+          <!-- 本月總收入 -->
+          <article class="summary-card">
+            <h3>本月總收入</h3>
+            <p class="amount income" id="total-income">—</p>
+            <span>Income</span>
+          </article>
+
+          <!-- 本月總支出 -->
+          <article class="summary-card">
+            <h3>本月總支出</h3>
+            <p class="amount expense" id="total-expense">—</p>
+            <span>Expenses</span>
+          </article>
+
+          <!-- 本月收支淨額 -->
+          <article class="summary-card">
+            <h3>本月收支淨額</h3>
+            <p class="amount balance" id="net-balance">—</p>
+            <span>Net Balance</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- 最近交易紀錄 -->
+      <section class="transactions-section">
+        <div class="section-heading">
+          <h2>最近交易紀錄</h2>
+          <p>Recent Transactions</p>
+        </div>
+
+        <!-- 交易紀錄表格 -->
+        <div class="table-wrapper">
+          <table class="transactions-table">
+            <thead>
+              <tr>
+                <th scope="col">日期</th>
+                <th scope="col">類型</th>
+                <th scope="col">分類</th>
+                <th scope="col">金額</th>
+                <th scope="col">備註</th>
+              </tr>
+            </thead>
+
+            <tbody id="recent-transactions">
+              <!-- 尚未建立 SQLite 資料庫，暫時顯示空狀態 -->
+              <tr>
+                <td colspan="5" class="empty-state">目前尚無交易紀錄</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   </body>
