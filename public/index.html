@@ -4,7 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Money Tracker｜個人財務管理系統</title>
+
+    <!-- 網頁樣式 -->
     <link rel="stylesheet" href="/style.css" />
+
+    <!-- 前端 JavaScript：defer 代表 HTML 解析完成後才執行 -->
+    <script src="/app.js" defer></script>
   </head>
 
   <body>
@@ -50,6 +55,11 @@
         <div class="section-heading">
           <h2>最近交易紀錄</h2>
           <p>Recent Transactions</p>
+
+          <!-- 顯示資料載入狀態 -->
+          <p id="transactions-status" role="status" aria-live="polite">
+            正在載入交易資料...
+          </p>
         </div>
 
         <!-- 交易紀錄表格 -->
@@ -65,10 +75,10 @@
               </tr>
             </thead>
 
+            <!-- 由 app.js 動態產生交易資料 -->
             <tbody id="recent-transactions">
-              <!-- 尚未建立 SQLite 資料庫，暫時顯示空狀態 -->
               <tr>
-                <td colspan="5" class="empty-state">目前尚無交易紀錄</td>
+                <td colspan="5" class="empty-state">正在載入交易紀錄...</td>
               </tr>
             </tbody>
           </table>
