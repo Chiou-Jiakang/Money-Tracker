@@ -400,7 +400,59 @@ app.put("/api/transactions/:id", (req, res) => {
   }
 });
 
-// 9. 啟動 HTTP 伺服器
+// 9. 刪除既有交易紀錄
+// DELETE /api/transactions/:id
+app.delete("/api/transactions/:id", (req, res) => {
+  try {
+    // 取得 URL 中的交易 ID
+    const rawId = req.params.id;
+    const transactionId = Number(rawId);
+
+    // 驗證交易 ID 是否為有效正整數
+    if (!/^[1-9]\d*$/.test(rawId) || !Number.isSafeInteger(transactionId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid transaction ID",
+      });
+    }
+
+    // 使用參數化 SQL 刪除指定交易
+    const result = db
+      .prepare(
+        `
+      DELETE FROM transactions
+      WHERE id = ?
+    `,
+      )
+      .run(transactionId);
+
+    // 如果沒有刪除任何資料，代表交易不存在
+    if (result.changes === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Transaction not found",
+      });
+    }
+
+    // 刪除成功，回傳交易 ID
+    return res.status(200).json({
+      success: true,
+      message: "Transaction deleted successfully",
+      data: {
+        id: transactionId,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to delete transaction:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete transaction",
+    });
+  }
+});
+
+// 10. 啟動 HTTP 伺服器
 app.listen(PORT, () => {
   console.log(`Money Tracker server running at http://localhost:${PORT}`);
 });
