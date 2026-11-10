@@ -8,7 +8,7 @@
     <!-- 網頁樣式 -->
     <link rel="stylesheet" href="/style.css" />
 
-    <!-- 前端 JavaScript：defer 代表 HTML 解析完成後才執行 -->
+    <!-- 前端 JavaScript -->
     <script src="/app.js" defer></script>
   </head>
 
@@ -25,7 +25,6 @@
         <h2>財務總覽 Dashboard</h2>
         <p>查看個人收入、支出與財務狀況。</p>
 
-        <!-- 財務摘要卡片 -->
         <div class="summary-grid">
           <!-- 本月總收入 -->
           <article class="summary-card">
@@ -50,19 +49,102 @@
         </div>
       </section>
 
+      <!-- 新增交易表單 -->
+      <section class="transaction-form-section">
+        <h2>新增交易 Add Transaction</h2>
+        <p>記錄新的收入或支出，資料將儲存至 SQLite。</p>
+
+        <form id="transaction-form">
+          <div class="form-grid">
+            <!-- 收支類型 -->
+            <div class="form-field">
+              <label for="transaction-type">收支類型</label>
+              <select id="transaction-type" name="type" required>
+                <option value="expense" selected>支出</option>
+                <option value="income">收入</option>
+              </select>
+            </div>
+
+            <!-- 交易分類 -->
+            <div class="form-field">
+              <label for="transaction-category">交易分類</label>
+              <select
+                id="transaction-category"
+                name="category_id"
+                required
+                disabled
+              >
+                <option value="">正在載入分類...</option>
+              </select>
+            </div>
+
+            <!-- 金額 -->
+            <div class="form-field">
+              <label for="transaction-amount">金額（NT$）</label>
+              <input
+                type="number"
+                id="transaction-amount"
+                name="amount"
+                min="1"
+                step="1"
+                placeholder="請輸入正整數金額"
+                required
+              />
+            </div>
+
+            <!-- 日期 -->
+            <div class="form-field">
+              <label for="transaction-date">交易日期</label>
+              <input
+                type="date"
+                id="transaction-date"
+                name="transaction_date"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- 備註 -->
+          <div class="form-field note-field">
+            <label for="transaction-note"> 備註（選填，最多 500 字） </label>
+            <textarea
+              id="transaction-note"
+              name="note"
+              rows="3"
+              maxlength="500"
+              placeholder="例如：午餐、交通費、打工薪資"
+            ></textarea>
+          </div>
+
+          <!-- 表單操作 -->
+          <div class="form-actions">
+            <button type="submit" id="save-transaction" disabled>
+              新增交易
+            </button>
+
+            <p
+              id="form-status"
+              class="form-feedback"
+              role="status"
+              aria-live="polite"
+            >
+              正在載入交易分類...
+            </p>
+          </div>
+        </form>
+      </section>
+
       <!-- 最近交易紀錄 -->
       <section class="transactions-section">
         <div class="section-heading">
           <h2>最近交易紀錄</h2>
           <p>Recent Transactions</p>
 
-          <!-- 顯示資料載入狀態 -->
           <p id="transactions-status" role="status" aria-live="polite">
             正在載入交易資料...
           </p>
         </div>
 
-        <!-- 交易紀錄表格 -->
         <div class="table-wrapper">
           <table class="transactions-table">
             <thead>
@@ -75,7 +157,7 @@
               </tr>
             </thead>
 
-            <!-- 由 app.js 動態產生交易資料 -->
+            <!-- JavaScript 動態建立交易列 -->
             <tbody id="recent-transactions">
               <tr>
                 <td colspan="5" class="empty-state">正在載入交易紀錄...</td>

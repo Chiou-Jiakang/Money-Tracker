@@ -21,7 +21,8 @@ body {
   line-height: 1.6;
 }
 
-/* 網站標題 */
+/* ===== 網站標題 ===== */
+
 header {
   padding: 24px 40px;
   border-bottom: 1px solid var(--border);
@@ -38,14 +39,14 @@ header p {
   color: var(--muted);
 }
 
-/* 主要內容區域 */
+/* ===== 主要內容 ===== */
+
 main {
   max-width: 1200px;
   margin: 40px auto;
   padding: 0 24px;
 }
 
-/* Dashboard 區塊 */
 section {
   padding: 32px;
   background: var(--surface);
@@ -60,21 +61,6 @@ section h2 {
 
 section p {
   color: var(--muted);
-}
-
-@media (max-width: 600px) {
-  header {
-    padding: 20px;
-  }
-
-  main {
-    margin: 24px auto;
-    padding: 0 16px;
-  }
-
-  section {
-    padding: 20px;
-  }
 }
 
 /* ===== 財務摘要卡片 ===== */
@@ -113,7 +99,8 @@ section p {
   font-size: 13px;
 }
 
-/* 收入、支出與收支淨額的顏色 */
+/* 收入、支出及淨額 */
+
 .summary-card .income {
   color: #4ade80;
 }
@@ -126,18 +113,135 @@ section p {
   color: #38bdf8;
 }
 
-/* 平板尺寸：改為兩欄 */
-@media (max-width: 900px) {
-  .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+/* ===== 新增交易表單 ===== */
+
+.transaction-form-section {
+  margin-top: 28px;
 }
 
-/* 手機尺寸：改為一欄 */
-@media (max-width: 600px) {
-  .summary-grid {
-    grid-template-columns: 1fr;
-  }
+.transaction-form-section h2 {
+  margin-bottom: 4px;
+}
+
+.transaction-form-section > p {
+  margin-top: 0;
+}
+
+#transaction-form {
+  margin-top: 28px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.form-field label {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 15px;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: var(--muted);
+}
+
+.form-field select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 日期選擇器 */
+
+.form-field input[type="date"] {
+  color-scheme: dark;
+}
+
+/* 備註 */
+
+.note-field {
+  margin-top: 20px;
+}
+
+.note-field textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* 操作按鈕 */
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+#save-transaction {
+  padding: 12px 24px;
+  background: var(--accent);
+  color: #082f49;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#save-transaction:hover:not(:disabled) {
+  background: #7dd3fc;
+}
+
+#save-transaction:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 表單回饋 */
+
+.form-feedback {
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.form-feedback.success {
+  color: #4ade80;
+}
+
+.form-feedback.error {
+  color: #fb7185;
 }
 
 /* ===== 最近交易紀錄 ===== */
@@ -187,4 +291,44 @@ section p {
   color: var(--muted);
   text-align: center;
   padding: 36px 16px !important;
+}
+
+/* ===== 響應式設計 RWD ===== */
+
+@media (max-width: 900px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 20px;
+  }
+
+  main {
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  section {
+    padding: 20px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #save-transaction {
+    width: 100%;
+  }
 }
