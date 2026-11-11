@@ -4142,3 +4142,801 @@ Milestone 10-3 尚未執行 Git Commit 與 GitHub Push。
 Git Commit、GitHub Push 與正式 Release 應分別確認，不可混為同一個狀態。
 
 Money Tracker 將持續採用功能實作、正向驗證、負向驗證、資料完整性檢查、問題紀錄及 Git 版本控制的方式完成後續開發。
+
+---
+
+# 二十八、Milestone 10-4｜Frontend Delete Transaction 實際測試報告
+
+**測試日期：** 2026-11-11
+**測試對象：** Money Tracker 前端刪除交易功能
+**後端 API：** DELETE /api/transactions/:id
+**基準 Commit：** 6a10ae1
+**本階段 Commit：** 尚未建立
+**測試方式：** 手動 UI、PowerShell、REST API、SQLite 檢查
+**整體判定：** 既定主要測試通過，完整系統驗收尚未完成
+
+## 28.1 測試目標
+
+驗證前端刪除功能是否可以：
+
+1. 正確顯示刪除按鈕。
+2. 正確識別指定交易。
+3. 顯示刪除確認視窗。
+4. 取消刪除而不修改資料。
+5. 正常呼叫 DELETE API。
+6. 顯示刪除成功訊息。
+7. 同步更新 Dashboard。
+8. 同步更新最近交易列表。
+9. 重新整理後保留刪除結果。
+10. 正確回應不存在的交易。
+11. 維持其他交易完整性。
+12. 維持 SQLite Integrity Check。
+13. 維持 Foreign Key Check。
+14. 在網路連線失敗時顯示錯誤。
+15. 避免將失敗操作誤判為成功。
+16. 在伺服器恢復後確認資料沒有遺失。
+
+## 28.2 測試環境
+
+| 項目         | 測試環境                  |
+| ------------ | ------------------------- |
+| 作業系統     | Windows                   |
+| 開發工具     | Visual Studio Code        |
+| Shell        | PowerShell                |
+| 前端         | HTML、CSS、JavaScript     |
+| 後端         | Node.js、Express          |
+| 資料庫       | SQLite                    |
+| 瀏覽器       | Microsoft Edge            |
+| API Base URL | http://localhost:3000     |
+| 專案目錄     | C:\Projects\Money-Tracker |
+
+測試使用本機開發環境，不代表已完成正式部署環境的驗證。
+
+## 28.3 測試狀態定義
+
+- PASS：已執行，符合預期。
+- FAIL：已執行，不符合預期。
+- NOT RUN：尚未執行。
+- PARTIAL：部分情境已驗證，但尚未涵蓋完整預定範圍。
+- BLOCKED：因環境或依賴問題無法執行。
+
+測試結論須根據實際執行結果。
+
+## 28.4 測試資料
+
+### 原始資料
+
+| ID  | 分類 | 金額 | 日期       | 備註                     |
+| --- | ---- | ---: | ---------- | ------------------------ |
+| 3   | 餐飲 |  180 | 2026-11-10 | Milestone 10-3 edit test |
+| 1   | 餐飲 |  150 | 2026-11-09 | Updated lunch test       |
+
+原始交易數量：
+
+2。
+
+原始 Dashboard：
+
+- Income：NT$0。
+- Expenses：NT$330。
+- Net Balance：-NT$330。
+
+### 正常刪除測試資料
+
+| 項目 | 內容                                 |
+| ---- | ------------------------------------ |
+| ID   | 4                                    |
+| 類型 | expense                              |
+| 分類 | 餐飲                                 |
+| 金額 | 123                                  |
+| 日期 | 2026-11-11                           |
+| 備註 | Milestone 10-4 DELETE temporary test |
+
+新增後：
+
+- 交易數量：3。
+- 本月支出：NT$453。
+- 本月淨額：-NT$453。
+
+### 連線失敗測試資料
+
+| 項目 | 內容                                |
+| ---- | ----------------------------------- |
+| ID   | 5                                   |
+| 類型 | expense                             |
+| 分類 | 餐飲                                |
+| 金額 | 77                                  |
+| 日期 | 2026-11-11                          |
+| 備註 | Milestone 10-4 network failure test |
+
+新增後：
+
+- 交易數量：3。
+- 本月支出：NT$407。
+- 本月淨額：-NT$407。
+
+ID 4、ID 5 均為本次實際取得的 SQLite 交易 ID，不是硬編碼測試規則。
+
+## 28.5 測試總表
+
+| Test ID         | 測試項目                 | 結果    |
+| --------------- | ------------------------ | ------- |
+| FRONT-DELETE-01 | 刪除按鈕顯示             | PASS    |
+| FRONT-DELETE-02 | 刪除確認視窗             | PASS    |
+| FRONT-DELETE-03 | 取消刪除                 | PASS    |
+| FRONT-DELETE-04 | 正常刪除交易             | PASS    |
+| FRONT-DELETE-05 | 刪除後交易列表更新       | PASS    |
+| FRONT-DELETE-06 | 刪除後 Dashboard 更新    | PASS    |
+| FRONT-DELETE-07 | 不存在交易處理           | PARTIAL |
+| FRONT-DELETE-08 | 前端連線失敗             | PASS    |
+| FRONT-DELETE-09 | 刪除後重新整理           | PASS    |
+| FRONT-DELETE-10 | 其他交易完整性           | PASS    |
+| FRONT-DELETE-11 | SQLite Integrity Check   | PASS    |
+| FRONT-DELETE-12 | SQLite Foreign Key Check | PASS    |
+| FRONT-DELETE-13 | 失敗後恢復伺服器         | PASS    |
+| FRONT-DELETE-14 | 失敗後資料仍存在         | PASS    |
+| FRONT-DELETE-15 | 專用測試資料清理         | PASS    |
+| FRONT-DELETE-16 | JavaScript 語法檢查      | PASS    |
+| FRONT-DELETE-17 | Git Diff 格式檢查        | PASS    |
+| FRONT-DELETE-18 | DELETE 成功但 GET 失敗   | NOT RUN |
+| FRONT-DELETE-19 | 正在編輯的交易遭刪除     | NOT RUN |
+| FRONT-DELETE-20 | 連續快速點擊刪除         | NOT RUN |
+
+FRONT-DELETE-07 標示 PARTIAL，是因為已驗證後端 HTTP 404，但尚未獨立驗證前端刪除流程接收到 HTTP 404 時的 UI 呈現。
+
+## 28.6 FRONT-DELETE-01｜刪除按鈕顯示
+
+### 前置條件
+
+- Express 正常。
+- GET Transactions API 正常。
+- 三筆測試交易已載入。
+- 前端 JavaScript 已更新。
+
+### 操作
+
+開啟 Money Tracker，檢查最近交易列表。
+
+### 預期結果
+
+- 每筆交易有編輯按鈕。
+- 每筆交易有刪除按鈕。
+- 刪除按鈕使用紅色樣式。
+- 按鈕對應正確交易。
+
+### 實際結果
+
+- 三筆交易皆有刪除按鈕。
+- 編輯按鈕保留。
+- 刪除按鈕紅色外框正常。
+- 操作欄排列正常。
+
+### 判定
+
+PASS。
+
+## 28.7 FRONT-DELETE-02｜刪除確認視窗
+
+### 測試交易
+
+ID 4。
+
+### 操作
+
+點擊 ID 4 的刪除按鈕。
+
+### 預期結果
+
+確認視窗顯示：
+
+- ID 4。
+- 2026-11-11。
+- 餐飲。
+- NT$123。
+- Milestone 10-4 DELETE temporary test。
+- 永久刪除提醒。
+
+### 實際結果
+
+確認視窗正確顯示上述資料。
+
+瀏覽器提供確定與取消選項。
+
+### 判定
+
+PASS。
+
+## 28.8 FRONT-DELETE-03｜取消刪除
+
+### 前置條件
+
+ID 4 存在。
+
+### 操作
+
+1. 開啟 ID 4 刪除確認視窗。
+2. 點擊取消。
+3. 檢查交易列表與 Dashboard。
+
+### 預期結果
+
+- 不刪除 ID 4。
+- 原資料完整。
+- 交易總數 3。
+- 總支出 NT$453。
+
+### 實際結果
+
+- 確認視窗關閉。
+- ID 4 仍顯示 NT$123。
+- ID 3 仍顯示 NT$180。
+- ID 1 仍顯示 NT$150。
+- 交易總數 3。
+- Dashboard NT$453。
+
+### 判定
+
+PASS。
+
+### 驗證限制
+
+此案例由 UI 操作及資料顯示確認取消結果；沒有另外記錄 Network 面板的逐筆 HTTP Request。
+
+## 28.9 FRONT-DELETE-04｜正常刪除
+
+### 前置條件
+
+ID 4 存在。
+
+### 操作
+
+1. 點擊 ID 4 的刪除按鈕。
+2. 確認視窗資料正確。
+3. 點擊確定。
+4. 等待刪除結果。
+
+### 預期結果
+
+- DELETE API 成功。
+- 前端顯示成功。
+- ID 4 消失。
+- 其他交易保留。
+- Dashboard 同步。
+
+### 實際結果
+
+前端出現：
+
+`交易 ID 4 刪除成功！Dashboard 與交易清單已更新。`
+
+交易列表移除 ID 4。
+
+交易數量由 3 變成 2。
+
+### 判定
+
+PASS。
+
+## 28.10 FRONT-DELETE-05｜列表更新
+
+### 刪除前
+
+- ID 4。
+- ID 3。
+- ID 1。
+
+### 刪除後
+
+- ID 3。
+- ID 1。
+
+### 實際結果
+
+ID 4 已消失。
+
+ID 3、ID 1 保留。
+
+交易總數顯示 2。
+
+### 判定
+
+PASS。
+
+## 28.11 FRONT-DELETE-06｜Dashboard 更新
+
+### 刪除前
+
+- Income：0。
+- Expenses：453。
+- Balance：-453。
+
+### 刪除金額
+
+123。
+
+### 預期結果
+
+453 - 123 = 330。
+
+0 - 330 = -330。
+
+### 實際結果
+
+- Income：NT$0。
+- Expenses：NT$330。
+- Balance：-NT$330。
+
+### 判定
+
+PASS。
+
+## 28.12 FRONT-DELETE-07｜不存在交易
+
+### 測試層次
+
+Backend API。
+
+### Endpoint
+
+`DELETE /api/transactions/4`
+
+### 前置條件
+
+ID 4 已經成功刪除。
+
+### 測試指令
+
+`curl.exe -i -X DELETE "http://localhost:3000/api/transactions/4"`
+
+### 預期 HTTP Status
+
+404 Not Found。
+
+### 實際 HTTP Status
+
+404 Not Found。
+
+### 實際 Content-Type
+
+application/json; charset=utf-8。
+
+### 實際 Response
+
+`{"success":false,"message":"Transaction not found"}`
+
+### 判定
+
+後端 API 測試：PASS。
+
+前端 HTTP 404 專項測試：NOT RUN。
+
+本測試案例整體狀態：PARTIAL。
+
+## 28.13 FRONT-DELETE-09｜刪除結果持久化
+
+### 前置條件
+
+ID 4 已刪除。
+
+### 操作
+
+重新整理 Money Tracker 網頁。
+
+### 預期結果
+
+- ID 4 不再顯示。
+- ID 3、ID 1 保留。
+- 交易數量 2。
+- 總支出 NT$330。
+
+### 實際結果
+
+重新整理後：
+
+- ID 4 不存在。
+- ID 3：NT$180。
+- ID 1：NT$150。
+- 交易總數：2。
+- 本月總支出：NT$330。
+- 本月淨額：-NT$330。
+
+### 判定
+
+PASS。
+
+## 28.14 FRONT-DELETE-10｜其他交易完整性
+
+### 測試目的
+
+確認刪除 ID 4 不會影響其他交易。
+
+### 驗證方法
+
+呼叫：
+
+`GET /api/transactions`
+
+### 實際資料
+
+| ID  | 分類 | 金額 | 日期       | 備註                     |
+| --- | ---- | ---: | ---------- | ------------------------ |
+| 3   | 餐飲 |  180 | 2026-11-10 | Milestone 10-3 edit test |
+| 1   | 餐飲 |  150 | 2026-11-09 | Updated lunch test       |
+
+確認 ID 4 不存在。
+
+### 判定
+
+PASS。
+
+## 28.15 FRONT-DELETE-11｜SQLite Integrity Check
+
+### 指令
+
+`node server/check-db.js`
+
+### 實際結果
+
+`Integrity Check`
+
+回傳：
+
+`ok`
+
+### 判定
+
+PASS。
+
+## 28.16 FRONT-DELETE-12｜Foreign Key Check
+
+### 指令
+
+`node server/check-db.js`
+
+### 實際結果
+
+`Foreign Key Check`
+
+回傳：
+
+`No foreign key violations`
+
+同時確認：
+
+- Transactions 正確參照 categories。
+- category_id 參照 categories.id。
+- ON DELETE：RESTRICT。
+- 八個預設分類存在。
+
+### 判定
+
+PASS。
+
+## 28.17 FRONT-DELETE-08｜前端連線失敗
+
+### 測試目的
+
+確認 Express 不可用時，前端不會誤報刪除成功。
+
+### 專用測試資料
+
+ID 5：
+
+- 金額 NT$77。
+- 日期 2026-11-11。
+- 備註 Milestone 10-4 network failure test。
+
+### 測試前狀態
+
+- 交易總數：3。
+- 總支出：NT$407。
+- 淨額：-NT$407。
+
+### 前置條件
+
+- 已載入 Money Tracker。
+- Express 已停止。
+- Port 3000 沒有監聽程序。
+- 網頁未重新整理。
+
+### 程序檢查
+
+執行 Get-NetTCPConnection。
+
+發現 PID：
+
+19192。
+
+再透過 Win32_Process 確認：
+
+- PID：19192。
+- Name：node.exe。
+- CommandLine：node server/server.js。
+
+確認程序身分後停止。
+
+重新檢查 Port 3000，沒有取得監聽程序。
+
+### 測試操作
+
+1. 回到已載入的網頁。
+2. 選擇 ID 5。
+3. 點擊刪除。
+4. 確認交易資訊。
+5. 點擊確定。
+6. 觀察網頁結果。
+
+### 預期結果
+
+- DELETE Request 無法連線。
+- 前端顯示錯誤。
+- 不顯示刪除成功。
+- ID 5 仍顯示。
+- Dashboard 不誤更新。
+
+### 實際結果
+
+顯示錯誤：
+
+`Failed to fetch`
+
+顯示紅色刪除失敗訊息。
+
+- ID 5：NT$77。
+- ID 3：NT$180。
+- ID 1：NT$150。
+- 交易數量：3。
+- 總支出：NT$407。
+- 淨額：-NT$407。
+
+### 判定
+
+PASS。
+
+### 限制
+
+本次測試的是伺服器沒有監聽程序的情況。
+
+尚未測試：
+
+- 長時間 Request Timeout。
+- 伺服器收到請求後突然中斷。
+- 資料庫刪除成功但 HTTP Response 遺失。
+- DELETE 成功但後續 GET 失敗。
+
+## 28.18 FRONT-DELETE-13｜伺服器恢復
+
+### 操作
+
+重新執行：
+
+`npm start`
+
+接著透過 GET API 查詢交易。
+
+### 實際結果
+
+API 成功回傳交易資料。
+
+### 判定
+
+PASS。
+
+## 28.19 FRONT-DELETE-14｜連線失敗後資料保留
+
+### 前置條件
+
+已完成前端 Failed to fetch 測試。
+
+Express 已重新啟動。
+
+### 查詢
+
+`GET /api/transactions`
+
+### 實際結果
+
+| ID  | 金額 | 備註                                |
+| --- | ---: | ----------------------------------- |
+| 5   |   77 | Milestone 10-4 network failure test |
+| 3   |  180 | Milestone 10-3 edit test            |
+| 1   |  150 | Updated lunch test                  |
+
+### 判定
+
+PASS。
+
+這是確認連線失敗沒有造成 ID 5 遺失的主要證據。
+
+## 28.20 FRONT-DELETE-15｜測試資料清理
+
+### 操作
+
+使用前端刪除 ID 5。
+
+### 預期結果
+
+- 刪除成功。
+- ID 5 不再顯示。
+- ID 3、ID 1 保留。
+- 交易數量恢復 2。
+- 總支出恢復 NT$330。
+
+### 實際結果
+
+出現綠色成功提示：
+
+`交易 ID 5 刪除成功！Dashboard 與交易清單已更新。`
+
+畫面顯示：
+
+- ID 3：NT$180。
+- ID 1：NT$150。
+- 交易總數：2。
+- 支出：NT$330。
+- 淨額：-NT$330。
+
+### 判定
+
+PASS。
+
+### 補充
+
+ID 5 的這次清理已完成即時畫面驗證。
+
+清理完成後額外重新整理的獨立驗證尚未記錄，不將其標示為另一項 PASS。
+
+## 28.21 FRONT-DELETE-16｜JavaScript 語法檢查
+
+### 測試指令
+
+`node --check public/app.js`
+
+`node --check server/server.js`
+
+### 實際結果
+
+未顯示基本語法錯誤。
+
+### 判定
+
+PASS。
+
+### 限制
+
+語法檢查不能保證全部程式邏輯與執行階段行為正確。
+
+## 28.22 FRONT-DELETE-17｜Git Diff 格式檢查
+
+### 測試指令
+
+`git diff --check`
+
+### 實際結果
+
+未顯示空白格式錯誤。
+
+### 判定
+
+PASS。
+
+### Git 差異
+
+當次執行：
+
+`git diff --stat`
+
+顯示：
+
+- public/app.js：421 行變更。
+- public/index.html：31 行變更。
+- public/style.css：265 行變更。
+- 3 files changed。
+- 611 insertions。
+- 106 deletions。
+
+此為當次尚未加入文件修改前的前端差異統計。
+
+## 28.23 錯誤與問題排除紀錄
+
+### 問題一：Ctrl + C 不代表伺服器已停止
+
+曾出現 Node.js 程序繼續監聽 Port 3000。
+
+處理方法：
+
+1. 檢查 Port。
+2. 找出 PID。
+3. 確認程序身分。
+4. 停止指定程序。
+5. 再次檢查 Port。
+
+本階段 PID 為 19192。
+
+### 問題二：伺服器停止後不應刷新頁面
+
+本次測試需要使用先前已載入的 HTML 與 JavaScript。
+
+若在 Express 停止後重新整理，頁面可能無法正常載入，因此會破壞測試前置條件。
+
+### 問題三：網路失敗與 HTTP 404 不同
+
+HTTP 404：
+
+- 伺服器正常回應。
+- 代表請求已抵達 HTTP 服務。
+- API 回傳指定錯誤。
+
+Failed to fetch：
+
+- 前端未成功取得 HTTP Response。
+- 不可直接視為 HTTP 404。
+- 需另行驗證後端資料狀態。
+
+### 問題四：不能只看畫面是否保留交易
+
+網路中斷時，前端畫面可能繼續保留舊資料。
+
+因此必須恢復伺服器後使用 GET 再次查詢，才能確認交易沒有遺失。
+
+此項已完成。
+
+## 28.24 尚未執行的補充測試
+
+| Test ID         | 測試情境                   | 狀態    |
+| --------------- | -------------------------- | ------- |
+| FRONT-DELETE-18 | DELETE 成功、後續 GET 失敗 | NOT RUN |
+| FRONT-DELETE-19 | 正在編輯的交易被刪除       | NOT RUN |
+| FRONT-DELETE-20 | 高速連續點擊刪除           | NOT RUN |
+| FRONT-DELETE-21 | 前端接收到 HTTP 404        | NOT RUN |
+| FRONT-DELETE-22 | 前端接收到 HTTP 500        | NOT RUN |
+| FRONT-DELETE-23 | 刪除回應與交易 ID 不一致   | NOT RUN |
+| FRONT-DELETE-24 | DELETE Request Timeout     | NOT RUN |
+| FRONT-DELETE-25 | 大量交易資料               | NOT RUN |
+| FRONT-DELETE-26 | 完整自動化 CRUD 回歸       | NOT RUN |
+| FRONT-DELETE-27 | 跨裝置顯示與操作           | NOT RUN |
+
+上述項目不能因為目前主要測試成功而自動判定通過。
+
+## 28.25 測試結論
+
+Milestone 10-4 已完成前端刪除交易的主要功能測試。
+
+已實際確認：
+
+- 刪除按鈕正常。
+- 確認視窗正常。
+- 取消刪除正常。
+- 正常刪除成功。
+- 刪除後列表更新。
+- Dashboard 計算正確。
+- 刪除結果重新載入後仍然成立。
+- 後端 HTTP 404 正確。
+- 其他交易完整。
+- SQLite Integrity Check 正常。
+- Foreign Key Check 無違規。
+- 前端連線失敗顯示正確。
+- 連線失敗時沒有誤報刪除成功。
+- 恢復伺服器後，ID 5 仍存在。
+- 專用測試資料清理成功。
+- JavaScript 基本語法檢查通過。
+- Git Diff 格式檢查通過。
+
+目前的開發測試資料：
+
+- ID 3：NT$180。
+- ID 1：NT$150。
+- 本月總收入：NT$0。
+- 本月總支出：NT$330。
+- 本月收支淨額：-NT$330。
+- 交易數量：2。
+
+以上為最後一次已提供的畫面快照，並非未來資料庫的固定內容。
+
+本階段仍有未執行的進階錯誤及自動化測試，也尚未完成 GitHub 提交與正式系統驗收。
+
+**Milestone 10-4 主要功能測試：PASS。**
+
+**Money Tracker 完整系統驗收：尚未完成。**
+
+---

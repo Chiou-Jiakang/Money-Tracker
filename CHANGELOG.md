@@ -3306,3 +3306,356 @@ Money Tracker 將持續以可驗證、可追溯、逐步完成的方式開發與
 本次 CHANGELOG 更新完成文字整理，但在實際執行 Git Commit 與 Push 之前，不宣稱已同步至 GitHub。
 
 本次修訂不代表 Money Tracker 已完成全部功能或正式產品驗收。
+
+---
+
+# Milestone 10-4｜Frontend Delete Transaction
+
+**開發日期：** 2026-11-11
+**目前狀態：** 功能實作及既定主要測試完成，文件整理與 Git 提交待完成
+**正式 Release：** 尚未發布
+**Git Commit：** 待建立
+
+## 1. 開發目標
+
+將 Milestone 09 已實作的後端 DELETE API 整合至 Money Tracker 前端，讓使用者可以直接在交易列表中刪除指定交易。
+
+本階段以延續既有系統為原則，不重新設計 SQLite Schema，也不修改已完成的 DELETE 後端 API。
+
+## 2. 修改檔案
+
+- `public/index.html`
+- `public/app.js`
+- `public/style.css`
+
+未修改：
+
+- `server/server.js`
+- SQLite 資料表結構
+
+## 3. Added｜新增功能
+
+### 3.1 刪除交易按鈕
+
+- 在最近交易列表的操作欄加入「刪除」按鈕。
+- 保留原本的「編輯」按鈕。
+- 每個刪除按鈕對應其交易 ID。
+- 避免在交易操作進行期間重複提交。
+
+### 3.2 刪除確認機制
+
+- 使用 `window.confirm()` 顯示刪除確認視窗。
+- 顯示交易 ID、日期、分類、金額及備註。
+- 提醒使用者刪除無法直接復原。
+- 使用者按下「取消」時不發送 DELETE Request。
+- 只有確認後才呼叫後端 API。
+
+### 3.3 DELETE API 整合
+
+使用既有端點：
+
+`DELETE /api/transactions/:id`
+
+前端透過 Fetch API 發送 DELETE Request。
+
+成功後解析 JSON Response，確認：
+
+- HTTP 回應成功。
+- `success` 為 true。
+- 回傳交易 ID 與預期相符。
+
+### 3.4 Dashboard 與交易清單同步
+
+刪除成功後：
+
+- 重新取得 `/api/transactions`。
+- 更新最近交易列表。
+- 更新交易筆數。
+- 重新計算本月收入。
+- 重新計算本月支出。
+- 重新計算本月收支淨額。
+- 顯示刪除成功訊息。
+
+### 3.5 刪除操作訊息
+
+新增：
+
+`delete-status`
+
+用途：
+
+- 顯示取消刪除。
+- 顯示刪除進行中。
+- 顯示刪除成功。
+- 顯示 API 錯誤。
+- 顯示網路連線失敗。
+
+成功與錯誤訊息使用不同顏色呈現。
+
+### 3.6 刪除按鈕 CSS
+
+新增：
+
+- `.delete-action`
+- `.delete-feedback`
+
+包含：
+
+- 紅色外框。
+- Hover 效果。
+- Focus 樣式。
+- Disabled 樣式。
+- 成功及錯誤訊息樣式。
+
+## 4. Changed｜功能調整
+
+- 交易列表操作欄由單一編輯按鈕改為編輯與刪除按鈕。
+- 新增、編輯及刪除操作使用共用提交狀態，降低重複操作風險。
+- 刪除成功後重新讀取後端資料，而非直接假設畫面資料已同步。
+- 當 DELETE 成功但後續 GET 失敗時，顯示需要重新確認資料的訊息。
+- 保留原本新增交易、編輯交易及 Dashboard 功能。
+
+## 5. Tested｜測試結果
+
+### 5.1 專用測試資料建立
+
+建立交易 ID 4：
+
+- 分類：餐飲。
+- 類型：支出。
+- 金額：NT$123。
+- 日期：2026-11-11。
+- 備註：Milestone 10-4 DELETE temporary test。
+
+新增後：
+
+- 交易總數：3。
+- 本月支出：NT$453。
+- 收支淨額：-NT$453。
+
+結果：PASS。
+
+### 5.2 刪除確認視窗
+
+確認視窗正確顯示：
+
+- ID 4。
+- 交易日期。
+- 分類。
+- 金額。
+- 備註。
+- 永久刪除警告。
+
+結果：PASS。
+
+### 5.3 取消刪除
+
+使用者選擇取消後：
+
+- ID 4 保留。
+- 交易數量仍為 3。
+- Dashboard 保持 NT$453。
+- 沒有執行正常刪除。
+
+結果：PASS。
+
+### 5.4 正常刪除
+
+刪除 ID 4 後：
+
+- 顯示刪除成功。
+- ID 4 從交易清單消失。
+- ID 3、ID 1 保留。
+- 交易數量由 3 變成 2。
+- 本月支出由 NT$453 變成 NT$330。
+- 收支淨額更新為 -NT$330。
+
+結果：PASS。
+
+### 5.5 刪除後持久化
+
+刪除 ID 4 後重新整理網頁。
+
+實際結果：
+
+- ID 4 沒有重新出現。
+- ID 3 金額 NT$180。
+- ID 1 金額 NT$150。
+- 交易數量維持 2。
+- Dashboard 維持 NT$330。
+
+結果：PASS。
+
+### 5.6 不存在交易 HTTP 404
+
+再次請求：
+
+`DELETE /api/transactions/4`
+
+實際結果：
+
+- HTTP 404 Not Found。
+- Content-Type：application/json。
+- success：false。
+- message：Transaction not found。
+
+結果：PASS。
+
+此項為後端 API 測試，不是前端 HTTP 404 畫面測試。
+
+### 5.7 SQLite 完整性
+
+執行：
+
+`node server/check-db.js`
+
+實際結果：
+
+- Categories Schema 正常。
+- Transactions Schema 正常。
+- Foreign Key 正常。
+- Integrity Check：ok。
+- Foreign Key Check：No foreign key violations。
+- 八個預設分類完整。
+
+結果：PASS。
+
+### 5.8 網路連線失敗測試
+
+建立專用交易 ID 5：
+
+- 金額：NT$77。
+- 日期：2026-11-11。
+- 備註：Milestone 10-4 network failure test。
+
+測試前：
+
+- 總支出：NT$407。
+- 交易數量：3。
+
+確認 Node.js PID 19192 對應：
+
+`node server/server.js`
+
+停止該程序後，確認 Port 3000 沒有監聽程序。
+
+在原本已載入的網頁對 ID 5 執行刪除。
+
+實際結果：
+
+- 前端顯示 Failed to fetch。
+- 顯示刪除失敗提示。
+- 沒有誤報刪除成功。
+- ID 5 仍顯示 NT$77。
+- Dashboard 保持 NT$407。
+- 交易數量維持 3。
+
+結果：PASS。
+
+### 5.9 伺服器恢復後資料確認
+
+重新啟動 Express。
+
+使用：
+
+`GET /api/transactions`
+
+確認：
+
+- ID 5：NT$77。
+- ID 3：NT$180。
+- ID 1：NT$150。
+
+交易總數為 3。
+
+結果：PASS。
+
+### 5.10 測試資料清理
+
+透過前端刪除專用的 ID 5。
+
+實際結果：
+
+- 顯示刪除成功。
+- ID 5 從交易列表消失。
+- ID 3、ID 1 保留。
+- 交易數量恢復為 2。
+- 本月支出恢復 NT$330。
+- 收支淨額恢復 -NT$330。
+
+結果：PASS。
+
+ID 5 清理後的額外重新整理驗證，尚未單獨記錄。
+
+## 6. Code Quality｜程式檢查
+
+已執行：
+
+- `node --check public/app.js`
+- `node --check server/server.js`
+- `git diff --check`
+- `git status --short`
+- `git diff --stat`
+
+結果：
+
+- 基本 JavaScript 語法檢查通過。
+- Git 空白格式檢查通過。
+- 三份前端檔案有修改。
+- 尚未提交。
+
+當次 Git 差異：
+
+- 3 files changed。
+- 611 insertions。
+- 106 deletions。
+
+上述為當次文字差異統計，並非正式程式碼審查或自動化測試結果。
+
+## 7. Known Limitations｜已知限制
+
+本階段尚未完成：
+
+- 前端 HTTP 404 情境的獨立 UI 測試。
+- 刪除目前正在編輯交易的獨立測試。
+- 完整 CRUD 自動化回歸測試。
+- DELETE API 所有非法 ID 邊界測試。
+- 伺服器寫入後但回應前中斷的故障測試。
+- 大量交易資料效能測試。
+- 完整系統驗收。
+
+## 8. Git Status｜版本狀態
+
+截至本次功能檢查：
+
+- Milestone 10-3 已提交。
+- Milestone 10-3 Commit：`6a10ae1`。
+- Milestone 10-4 前端功能已完成本機實作。
+- Milestone 10-4 主要測試已完成。
+- Milestone 10-4 文件整理中。
+- Milestone 10-4 尚未建立 Git Commit。
+- Milestone 10-4 尚未 Push。
+- 正式 Release 尚未發布。
+
+## 9. Next Steps｜後續工作
+
+1. 更新 CHANGELOG.md。
+2. 更新 docs/DEVELOPMENT_LOG.md。
+3. 更新 docs/TESTING.md。
+4. 修正三份文件頂部的最新專案狀態。
+5. 確認測試資料清理後的最終狀態。
+6. 檢查 Git 差異。
+7. 建立 Milestone 10-4 Commit。
+8. Push 至 GitHub。
+9. 確認本機與遠端同步。
+10. 進入下一階段功能開發。
+
+## 10. Milestone Conclusion
+
+Milestone 10-4 已完成前端刪除交易功能，並通過既定主要正向與負向測試。
+
+後端 DELETE API 成功整合至前端，使用者可以透過交易列表刪除指定交易，並在刪除成功後看到 Dashboard 與最近交易資料同步更新。
+
+本階段尚待文件最終核對與 GitHub 提交。
+
+此功能完成不代表 Money Tracker 已完成正式系統驗收。

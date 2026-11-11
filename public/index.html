@@ -61,7 +61,12 @@
 
             <div class="form-field">
               <label for="transaction-category">交易分類</label>
-              <select id="transaction-category" name="category_id" required disabled>
+              <select
+                id="transaction-category"
+                name="category_id"
+                required
+                disabled
+              >
                 <option value="">正在載入分類...</option>
               </select>
             </div>
@@ -102,12 +107,24 @@
           </div>
 
           <div class="form-actions">
-            <button type="submit" id="save-transaction" disabled>新增交易</button>
+            <button type="submit" id="save-transaction" disabled>
+              新增交易
+            </button>
             <!-- 只有編輯既有交易時才會顯示；不會刪除紀錄 -->
-            <button type="button" id="cancel-edit" class="secondary-button" hidden>
+            <button
+              type="button"
+              id="cancel-edit"
+              class="secondary-button"
+              hidden
+            >
               取消編輯
             </button>
-            <p id="form-status" class="form-feedback" role="status" aria-live="polite">
+            <p
+              id="form-status"
+              class="form-feedback"
+              role="status"
+              aria-live="polite"
+            >
               正在載入交易分類...
             </p>
           </div>
@@ -122,6 +139,12 @@
           <p id="transactions-status" role="status" aria-live="polite">
             正在載入交易資料...
           </p>
+          <p
+            id="delete-status"
+            class="delete-feedback"
+            role="status"
+            aria-live="polite"
+          ></p>
         </div>
 
         <div class="table-wrapper">

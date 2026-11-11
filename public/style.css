@@ -8,7 +8,9 @@
   --border: #334155;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -24,19 +26,34 @@ header {
   border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
-header h1 { margin: 0; color: var(--accent); }
-header p { margin: 4px 0 0; color: var(--muted); }
+header h1 {
+  margin: 0;
+  color: var(--accent);
+}
+header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
 
 /* ===== 主內容與共用區塊 ===== */
-main { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
+main {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
 section {
   padding: 32px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
 }
-section h2 { margin-top: 0; color: var(--text); }
-section p { color: var(--muted); }
+section h2 {
+  margin-top: 0;
+  color: var(--text);
+}
+section p {
+  color: var(--muted);
+}
 
 /* ===== 財務摘要 ===== */
 .summary-grid {
@@ -64,27 +81,53 @@ section p { color: var(--muted); }
   font-weight: 700;
   line-height: 1.3;
 }
-.summary-card span { color: var(--muted); font-size: 13px; }
-.summary-card .income { color: #4ade80; }
-.summary-card .expense { color: #fb7185; }
-.summary-card .balance { color: #38bdf8; }
+.summary-card span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.summary-card .income {
+  color: #4ade80;
+}
+.summary-card .expense {
+  color: #fb7185;
+}
+.summary-card .balance {
+  color: #38bdf8;
+}
 
 /* ===== 新增與編輯共用表單 ===== */
-.transaction-form-section { margin-top: 28px; scroll-margin-top: 20px; }
-.transaction-form-section h2 { margin-bottom: 4px; }
-.transaction-form-section > p { margin-top: 0; }
+.transaction-form-section {
+  margin-top: 28px;
+  scroll-margin-top: 20px;
+}
+.transaction-form-section h2 {
+  margin-bottom: 4px;
+}
+.transaction-form-section > p {
+  margin-top: 0;
+}
 .transaction-form-section.editing {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.18);
 }
-#transaction-form { margin-top: 28px; }
+#transaction-form {
+  margin-top: 28px;
+}
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
-.form-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.form-field label { font-size: 14px; color: var(--muted); }
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.form-field label {
+  font-size: 14px;
+  color: var(--muted);
+}
 .form-field input,
 .form-field select,
 .form-field textarea {
@@ -104,11 +147,23 @@ section p { color: var(--muted); }
   outline-offset: 2px;
 }
 .form-field input::placeholder,
-.form-field textarea::placeholder { color: var(--muted); }
-.form-field select:disabled { opacity: 0.6; cursor: not-allowed; }
-.form-field input[type="date"] { color-scheme: dark; }
-.note-field { margin-top: 20px; }
-.note-field textarea { resize: vertical; min-height: 90px; }
+.form-field textarea::placeholder {
+  color: var(--muted);
+}
+.form-field select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.form-field input[type="date"] {
+  color-scheme: dark;
+}
+.note-field {
+  margin-top: 20px;
+}
+.note-field textarea {
+  resize: vertical;
+  min-height: 90px;
+}
 
 /* ===== 操作按鈕與回饋 ===== */
 .form-actions {
@@ -133,29 +188,53 @@ section p { color: var(--muted); }
   color: #082f49;
   border: none;
 }
-#save-transaction:hover:not(:disabled) { background: #7dd3fc; }
+#save-transaction:hover:not(:disabled) {
+  background: #7dd3fc;
+}
 .secondary-button {
   color: var(--text);
   background: transparent;
   border: 1px solid var(--muted);
 }
-.secondary-button:hover:not(:disabled) { background: #334155; }
+.secondary-button:hover:not(:disabled) {
+  background: #334155;
+}
 #save-transaction:disabled,
 .secondary-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 /* hidden 必須能覆蓋 button 的顯示樣式 */
-[hidden] { display: none !important; }
-.form-feedback { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
-.form-feedback.success { color: #4ade80; }
-.form-feedback.error { color: #fb7185; }
+[hidden] {
+  display: none !important;
+}
+.form-feedback {
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.form-feedback.success {
+  color: #4ade80;
+}
+.form-feedback.error {
+  color: #fb7185;
+}
 
 /* ===== 最近交易紀錄 ===== */
-.transactions-section { margin-top: 28px; }
-.section-heading h2 { margin-bottom: 4px; }
-.section-heading p { margin-top: 0; }
-.table-wrapper { width: 100%; overflow-x: auto; margin-top: 24px; }
+.transactions-section {
+  margin-top: 28px;
+}
+.section-heading h2 {
+  margin-bottom: 4px;
+}
+.section-heading p {
+  margin-top: 0;
+}
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 24px;
+}
 .transactions-table {
   width: 100%;
   border-collapse: collapse;
@@ -167,9 +246,19 @@ section p { color: var(--muted); }
   padding: 16px;
   border-bottom: 1px solid var(--border);
 }
-.transactions-table th { color: var(--muted); font-size: 14px; font-weight: 500; }
-.transactions-table td { font-size: 14px; }
-.empty-state { color: var(--muted); text-align: center; padding: 36px 16px !important; }
+.transactions-table th {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+.transactions-table td {
+  font-size: 14px;
+}
+.empty-state {
+  color: var(--muted);
+  text-align: center;
+  padding: 36px 16px !important;
+}
 .edit-action {
   border: 1px solid var(--accent);
   border-radius: 7px;
@@ -180,21 +269,107 @@ section p { color: var(--muted); }
   font-size: 13px;
   cursor: pointer;
 }
-.edit-action:hover:not(:disabled) { background: rgba(56, 189, 248, 0.14); }
-.edit-action:disabled { opacity: 0.5; cursor: not-allowed; }
-.editing-row { background: rgba(56, 189, 248, 0.09); }
+.edit-action:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.14);
+}
+.edit-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.editing-row {
+  background: rgba(56, 189, 248, 0.09);
+}
 
 /* ===== 響應式設計 ===== */
 @media (max-width: 900px) {
-  .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 @media (max-width: 600px) {
-  header { padding: 20px; }
-  main { margin: 24px auto; padding: 0 16px; }
-  section { padding: 20px; }
-  .summary-grid { grid-template-columns: 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-  .form-actions { align-items: stretch; flex-direction: column; }
+  header {
+    padding: 20px;
+  }
+  main {
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+  section {
+    padding: 20px;
+  }
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
   #save-transaction,
-  #cancel-edit { width: 100%; }
+  #cancel-edit {
+    width: 100%;
+  }
+}
+
+/* ===== Milestone 10-4：交易刪除操作 ===== */
+
+/* 保持操作按鈕排列於同一列 */
+.transaction-actions {
+  white-space: nowrap;
+}
+
+/* 編輯與刪除按鈕之間的距離 */
+.transaction-actions .delete-action {
+  margin-left: 8px;
+}
+
+/* 刪除按鈕 */
+.delete-action {
+  border: 1px solid #fb7185;
+  border-radius: 7px;
+  padding: 5px 12px;
+  background: transparent;
+  color: #fda4af;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.delete-action:hover:not(:disabled) {
+  background: rgba(251, 113, 133, 0.14);
+  border-color: #fda4af;
+}
+
+.delete-action:focus-visible {
+  outline: 2px solid #fb7185;
+  outline-offset: 2px;
+}
+
+.delete-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 刪除操作結果訊息 */
+.delete-feedback {
+  margin: 8px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.delete-feedback:empty {
+  display: none;
+}
+
+.delete-feedback.success {
+  color: #4ade80;
+}
+
+.delete-feedback.error {
+  color: #fb7185;
 }
