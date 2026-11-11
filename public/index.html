@@ -5,42 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Money Tracker｜個人財務管理系統</title>
 
-    <!-- 網頁樣式 -->
+    <!-- 網頁樣式：延續 Milestone 10-2 的深色主題 -->
     <link rel="stylesheet" href="/style.css" />
 
-    <!-- 前端 JavaScript -->
+    <!-- 前端功能：Dashboard、Create、Update -->
     <script src="/app.js" defer></script>
   </head>
 
   <body>
-    <!-- 網站標題 -->
+    <!-- 1. 網站標題 -->
     <header>
       <h1>Money Tracker</h1>
       <p>個人財務管理系統</p>
     </header>
 
     <main>
-      <!-- 財務總覽 -->
+      <!-- 2. 財務總覽 -->
       <section class="dashboard">
         <h2>財務總覽 Dashboard</h2>
         <p>查看個人收入、支出與財務狀況。</p>
 
         <div class="summary-grid">
-          <!-- 本月總收入 -->
           <article class="summary-card">
             <h3>本月總收入</h3>
             <p class="amount income" id="total-income">—</p>
             <span>Income</span>
           </article>
-
-          <!-- 本月總支出 -->
           <article class="summary-card">
             <h3>本月總支出</h3>
             <p class="amount expense" id="total-expense">—</p>
             <span>Expenses</span>
           </article>
-
-          <!-- 本月收支淨額 -->
           <article class="summary-card">
             <h3>本月收支淨額</h3>
             <p class="amount balance" id="net-balance">—</p>
@@ -49,14 +44,13 @@
         </div>
       </section>
 
-      <!-- 新增交易表單 -->
-      <section class="transaction-form-section">
-        <h2>新增交易 Add Transaction</h2>
-        <p>記錄新的收入或支出，資料將儲存至 SQLite。</p>
+      <!-- 3. 新增 / 編輯共用表單：編輯時由 JS 切換標題、提示與按鈕 -->
+      <section class="transaction-form-section" id="transaction-editor">
+        <h2 id="form-heading">新增交易 Add Transaction</h2>
+        <p id="form-description">記錄新的收入或支出，資料將儲存至 SQLite。</p>
 
         <form id="transaction-form">
           <div class="form-grid">
-            <!-- 收支類型 -->
             <div class="form-field">
               <label for="transaction-type">收支類型</label>
               <select id="transaction-type" name="type" required>
@@ -65,20 +59,13 @@
               </select>
             </div>
 
-            <!-- 交易分類 -->
             <div class="form-field">
               <label for="transaction-category">交易分類</label>
-              <select
-                id="transaction-category"
-                name="category_id"
-                required
-                disabled
-              >
+              <select id="transaction-category" name="category_id" required disabled>
                 <option value="">正在載入分類...</option>
               </select>
             </div>
 
-            <!-- 金額 -->
             <div class="form-field">
               <label for="transaction-amount">金額（NT$）</label>
               <input
@@ -92,7 +79,6 @@
               />
             </div>
 
-            <!-- 日期 -->
             <div class="form-field">
               <label for="transaction-date">交易日期</label>
               <input
@@ -104,9 +90,8 @@
             </div>
           </div>
 
-          <!-- 備註 -->
           <div class="form-field note-field">
-            <label for="transaction-note"> 備註（選填，最多 500 字） </label>
+            <label for="transaction-note">備註（選填，最多 500 字）</label>
             <textarea
               id="transaction-note"
               name="note"
@@ -116,30 +101,24 @@
             ></textarea>
           </div>
 
-          <!-- 表單操作 -->
           <div class="form-actions">
-            <button type="submit" id="save-transaction" disabled>
-              新增交易
+            <button type="submit" id="save-transaction" disabled>新增交易</button>
+            <!-- 只有編輯既有交易時才會顯示；不會刪除紀錄 -->
+            <button type="button" id="cancel-edit" class="secondary-button" hidden>
+              取消編輯
             </button>
-
-            <p
-              id="form-status"
-              class="form-feedback"
-              role="status"
-              aria-live="polite"
-            >
+            <p id="form-status" class="form-feedback" role="status" aria-live="polite">
               正在載入交易分類...
             </p>
           </div>
         </form>
       </section>
 
-      <!-- 最近交易紀錄 -->
+      <!-- 4. 最近交易紀錄：新增「操作」欄位 -->
       <section class="transactions-section">
         <div class="section-heading">
           <h2>最近交易紀錄</h2>
           <p>Recent Transactions</p>
-
           <p id="transactions-status" role="status" aria-live="polite">
             正在載入交易資料...
           </p>
@@ -154,13 +133,12 @@
                 <th scope="col">分類</th>
                 <th scope="col">金額</th>
                 <th scope="col">備註</th>
+                <th scope="col">操作</th>
               </tr>
             </thead>
-
-            <!-- JavaScript 動態建立交易列 -->
             <tbody id="recent-transactions">
               <tr>
-                <td colspan="5" class="empty-state">正在載入交易紀錄...</td>
+                <td colspan="6" class="empty-state">正在載入交易紀錄...</td>
               </tr>
             </tbody>
           </table>

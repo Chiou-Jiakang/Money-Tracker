@@ -1,6 +1,6 @@
 # Money Tracker｜版本更新紀錄（CHANGELOG）
 
-本文件記錄 Money Tracker 個人財務管理系統的功能新增、程式修改、錯誤修復、資料庫設計、測試結果及重要開發里程碑。
+本文件完整記錄 Money Tracker 個人財務管理系統的功能新增、程式修改、錯誤修復、資料庫設計、測試結果、Git 版本歷史及重要開發里程碑。
 
 本專案使用 HTML、CSS、JavaScript、Node.js、Express 與 SQLite 開發，並透過 Git 與 GitHub 進行版本控制。
 
@@ -29,10 +29,634 @@
 - 更新歷史文件時，應保留重要的技術決策及可追溯資訊。
 - 功能實作完成不代表系統整合測試已完成。
 - Git Commit 不等於正式產品 Release。
+- 歷史紀錄中的狀態以當時開發日期為準。
+- 最新專案狀態應以本文件最新的 Current Status 區段為準。
+- 文件更新不應自行改變尚未執行的 Git 操作狀態。
+- 前端驗證與後端驗證應分別記錄，不能混為同一項測試。
+- 資料庫持久化、畫面同步及網路連線失敗應分別驗證。
+- 原有歷史紀錄與新階段紀錄應能互相追溯。
 
 ---
 
-# Unreleased｜目前開發中
+# Latest Status｜2026-11-11 最新開發狀態
+
+最後更新日期：2026-11-11
+
+目前開發階段：Milestone 10-3｜Frontend Edit Transaction
+
+## 最新專案摘要
+
+Money Tracker 已完成基本全端架構，並實作交易 CRUD 後端 API。
+
+目前前端已完成：
+
+- Dashboard 動態資料載入。
+- 本月總收入計算。
+- 本月總支出計算。
+- 本月收支淨額計算。
+- 最近交易紀錄動態顯示。
+- 新增交易表單。
+- 編輯交易表單。
+- 交易分類動態選取。
+- 新增交易的 POST API 整合。
+- 編輯交易的 PUT API 整合。
+- 新增及編輯成功後重新載入交易資料。
+- Dashboard 與交易清單同步更新。
+- 基本表單輸入驗證。
+- 取消編輯。
+- API 錯誤訊息提示。
+- API 連線失敗處理。
+
+目前仍未完成：
+
+- 前端刪除交易操作介面。
+- 完整前端 CRUD 驗收。
+- 所有 API 輸入邊界測試。
+- 財務圖表與進階分析。
+- 日期及分類篩選。
+- CSV 資料匯出。
+- 完整自動化測試。
+- 正式 Release。
+
+## 最新 Git 狀態
+
+| 階段           | Commit    | 狀態                     |
+| -------------- | --------- | ------------------------ |
+| Milestone 01   | `1798256` | 已提交                   |
+| Milestone 02   | `23e6afe` | 已提交                   |
+| Milestone 03   | `fe6cd52` | 已提交                   |
+| Milestone 04   | `d654756` | 已提交                   |
+| Milestone 05   | `eacbbb8` | 已提交                   |
+| Milestone 06   | `703b3f6` | 已提交                   |
+| Milestone 07   | `8c5b850` | 已提交                   |
+| Milestone 08   | `5b3486b` | 已提交                   |
+| Milestone 09   | `5900b30` | 已提交                   |
+| Milestone 10-1 | `fd2967f` | 已提交                   |
+| Milestone 10-2 | `bb18c64` | 已提交                   |
+| Milestone 10-3 | 待取得    | 本機功能及既定測試已完成 |
+
+Milestone 10-3 尚未執行正式 Commit 與 Push。
+
+目前尚未發布正式版本。
+
+## 最新交易資料快照
+
+以下為 2026-11-11 完成 Milestone 10-3 測試後的實際畫面資料。
+
+| ID  | 日期       | 類型    | 分類 | 金額   | 備註                     |
+| --- | ---------- | ------- | ---- | ------ | ------------------------ |
+| 3   | 2026-11-10 | expense | 餐飲 | NT$180 | Milestone 10-3 edit test |
+| 1   | 2026-11-09 | expense | 餐飲 | NT$150 | Updated lunch test       |
+
+當時 Dashboard：
+
+- 本月總收入：NT$0。
+- 本月總支出：NT$330。
+- 本月收支淨額：-NT$330。
+- 交易總數：2 筆。
+
+這些數字是測試快照，不代表未來資料庫必須保持相同內容。
+
+---
+
+# Current Unreleased Features｜最新尚未發布功能
+
+## U1. Dashboard 動態整合
+
+Milestone：10-1
+
+Commit：`fd2967f`
+
+Commit Message：
+
+`feat: integrate dashboard with transactions API`
+
+### 新增功能
+
+- 透過前端 JavaScript 發送 GET API。
+- 使用 Fetch API 與 Express 通訊。
+- 從 SQLite 取得交易資料。
+- 解析 API 回傳的 JSON。
+- 動態更新 Dashboard。
+- 計算本月總收入。
+- 計算本月總支出。
+- 計算本月收支淨額。
+- 動態顯示最近交易。
+- 顯示交易總數。
+- 顯示最近交易實際筆數。
+- 處理交易資料為空的情況。
+- 處理 API 載入失敗。
+- 使用不同顏色區分收入、支出。
+- 將交易日期、類型、分類、金額及備註顯示於表格。
+
+### 實際測試
+
+測試交易：
+
+- ID：1。
+- 金額：NT$150。
+- 類型：expense。
+- 分類：餐飲。
+- 備註：Updated lunch test。
+
+實際結果：
+
+- 本月收入 NT$0。
+- 本月支出 NT$150。
+- 本月淨額 -NT$150。
+- 最近交易成功顯示 ID 1。
+- 交易總數正確。
+
+### 技術意義
+
+此階段將原本的靜態 Dashboard 轉換成從後端取得資料的動態介面。
+
+畫面數據不再僅依賴 HTML 中固定寫入的金額。
+
+前端透過 API 取得交易，再由 JavaScript 計算並更新顯示結果。
+
+### 已知限制
+
+- 尚未完成更完整的跨月份驗證。
+- 尚未完成大量交易效能測試。
+- 尚未完成所有日期與時區邊界測試。
+- 尚未建立完整自動化測試套件。
+
+### 狀態
+
+- 功能實作：完成。
+- 主要功能測試：PASS。
+- Git Commit：完成。
+- GitHub Push：完成。
+
+---
+
+## U2. 前端新增交易
+
+Milestone：10-2
+
+Commit：`bb18c64`
+
+Commit Message：
+
+`feat: implement frontend transaction creation form`
+
+### 新增功能
+
+- 建立新增交易表單。
+- 提供收支類型選單。
+- 提供交易分類選單。
+- 提供金額輸入欄位。
+- 提供日期選擇欄位。
+- 提供備註欄位。
+- 提供新增交易按鈕。
+- 由 Categories API 載入分類。
+- 根據收入或支出切換分類選項。
+- 使用 POST API 建立交易。
+- 提交前執行基本資料驗證。
+- 成功後顯示操作結果。
+- 成功後重新查詢交易資料。
+- 成功後更新 Dashboard。
+- 成功後更新最近交易紀錄。
+- API 失敗時顯示錯誤訊息。
+
+### 正常新增測試
+
+測試前資料：
+
+- ID 1。
+- 金額 NT$150。
+- 總支出 NT$150。
+- 交易總數 1。
+
+新增測試資料：
+
+- 交易 ID：3。
+- 類型：expense。
+- 分類：餐飲。
+- 金額：NT$120。
+- 日期：2026-11-10。
+- 備註：Milestone 10-2 frontend test。
+
+實際結果：
+
+- 新增成功。
+- 成功取得 ID 3。
+- 交易總數由 1 變成 2。
+- Dashboard 支出由 NT$150 變成 NT$270。
+- 收支淨額變成 -NT$270。
+- 最近交易顯示新紀錄。
+- 原本 ID 1 保留。
+
+測試狀態：PASS。
+
+### 資料持久化驗證
+
+完成新增後重新整理 Money Tracker。
+
+實際結果：
+
+- ID 3 仍存在。
+- 金額仍為 NT$120。
+- 備註保持不變。
+- ID 1 仍存在。
+- 交易總數仍為 2。
+- Dashboard 仍顯示 NT$270。
+
+測試狀態：PASS。
+
+### 零元金額測試
+
+測試輸入：
+
+`0`
+
+實際結果：
+
+- 瀏覽器顯示數值限制。
+- 表單阻擋送出。
+- 未新增交易。
+- Dashboard 保持不變。
+
+測試狀態：PASS。
+
+### 小數金額測試
+
+測試輸入：
+
+`120.5`
+
+實際結果：
+
+- 瀏覽器顯示不合法數值提示。
+- 未新增交易。
+- 原有交易保持完整。
+
+測試狀態：PASS。
+
+### 收入分類切換
+
+將收支類型切換成收入。
+
+實際可見分類：
+
+- 薪資。
+- 獎金。
+- 其他收入。
+
+測試狀態：PASS。
+
+此測試確認分類選單切換，不代表已完整驗證收入交易新增的所有流程。
+
+### 本階段限制
+
+- 尚未完成完整前端 CRUD。
+- 尚未完成更完整的輸入邊界驗證。
+- 尚未完成前端自動化測試。
+- 尚未完成所有網路失敗情境測試。
+
+### Git 狀態
+
+- 功能：完成。
+- 既定主要測試：PASS。
+- Commit：完成。
+- Push：完成。
+- GitHub SHA：`bb18c64`。
+
+---
+
+## U3. 前端編輯交易
+
+Milestone：10-3
+
+開發狀態：本機功能實作完成。
+
+Git 狀態：尚未提交本階段 Commit。
+
+### 功能目的
+
+讓使用者可以在 Money Tracker 網頁直接修改既有交易，而不需要透過 PowerShell 手動發送 PUT API 請求。
+
+### 新增功能
+
+- 在最近交易列表新增「編輯」按鈕。
+- 點擊編輯後識別對應交易。
+- 自動載入原始交易資料。
+- 顯示正在編輯的交易 ID。
+- 表單從新增模式切換為編輯模式。
+- 顯示目前交易分類。
+- 顯示目前金額。
+- 顯示目前交易日期。
+- 顯示目前備註。
+- 支援修改分類。
+- 支援修改金額。
+- 支援修改日期。
+- 支援修改備註。
+- 提供儲存修改按鈕。
+- 提供取消編輯按鈕。
+- 使用 PUT API 更新 SQLite。
+- 成功修改後更新交易列表。
+- 成功修改後更新 Dashboard。
+- 修改失敗時顯示錯誤提示。
+- 無效金額時阻擋提交。
+- 連線失敗時不誤報成功。
+- 連線失敗時保留編輯表單內容。
+
+### API
+
+`PUT /api/transactions/:id`
+
+### 正常編輯流程
+
+1. 使用者開啟 Money Tracker。
+2. 找到欲修改的交易。
+3. 點擊編輯。
+4. 前端載入原始資料。
+5. 使用者修改表單。
+6. 點擊儲存修改。
+7. 前端執行輸入驗證。
+8. 透過 Fetch API 發送 PUT Request。
+9. Express 接收交易 ID 與 Request Body。
+10. 後端驗證交易資料。
+11. SQLite 更新原有紀錄。
+12. API 回傳結果。
+13. 前端顯示修改成功。
+14. 重新取得交易資料。
+15. 更新 Dashboard。
+16. 更新最近交易列表。
+17. 表單恢復新增模式。
+
+### 正向測試資料
+
+測試交易：
+
+ID 3。
+
+修改前：
+
+- 分類：餐飲。
+- 類型：expense。
+- 金額：NT$120。
+- 日期：2026-11-10。
+- 備註：Milestone 10-2 frontend test。
+
+修改後：
+
+- 分類：餐飲。
+- 類型：expense。
+- 金額：NT$180。
+- 日期：2026-11-10。
+- 備註：Milestone 10-3 edit test。
+
+### 正向測試結果
+
+- 原始資料成功載入。
+- 修改成功。
+- 原始交易 ID 維持 3。
+- 原本交易未被複製成新交易。
+- 交易總數仍為 2。
+- 本月總支出從 NT$270 更新為 NT$330。
+- 本月淨額從 -NT$270 更新為 -NT$330。
+- 最近交易表格顯示 NT$180。
+- 備註成功更新。
+- 原本 ID 1 未受影響。
+
+測試狀態：PASS。
+
+### 重新整理驗證
+
+重新整理網頁後：
+
+- ID 3 仍為 NT$180。
+- 備註仍為 Milestone 10-3 edit test。
+- ID 1 仍為 NT$150。
+- Dashboard 仍為 NT$330。
+- 總筆數仍為 2。
+
+測試狀態：PASS。
+
+### 取消編輯測試
+
+操作：
+
+1. 點擊 ID 3 的編輯。
+2. 暫時修改表單內容。
+3. 點擊取消編輯。
+4. 檢查交易列表。
+
+實際結果：
+
+- 表單返回新增交易模式。
+- 沒有儲存暫時輸入值。
+- 原交易沒有改變。
+- Dashboard 沒有因取消操作產生異動。
+
+測試狀態：PASS。
+
+### 零元金額測試
+
+測試輸入：
+
+`0`
+
+實際結果：
+
+- 瀏覽器顯示數值須大於或等於 1。
+- 阻擋表單正常送出。
+- 原交易金額保持不變。
+- 交易數量保持不變。
+
+測試狀態：PASS。
+
+### 小數金額測試
+
+測試輸入：
+
+`180.5`
+
+實際結果：
+
+- 瀏覽器顯示不合法數值提示。
+- 提示鄰近有效整數為 180 和 181。
+- 原交易未被修改。
+- Dashboard 保持原數據。
+
+測試狀態：PASS。
+
+### 不存在交易 ID 測試
+
+測試端點：
+
+`PUT /api/transactions/9999`
+
+測試資料：
+
+- category_id：4。
+- amount：180。
+- transaction_date：2026-11-10。
+- note：API error handling test。
+
+最終實際結果：
+
+HTTP Status：
+
+`404 Not Found`
+
+Response：
+
+`{"success":false,"message":"Transaction not found"}`
+
+測試狀態：PASS。
+
+本項測試直接驗證後端 API，而非透過前端使用者介面操作不存在的 ID。
+
+### HTTP 404 後資料完整性
+
+執行 GET API。
+
+實際結果：
+
+- ID 3 保持 NT$180。
+- ID 1 保持 NT$150。
+- 交易數量保持 2。
+- 沒有新增或修改其他交易。
+
+測試狀態：PASS。
+
+### 伺服器中斷測試
+
+測試目的：
+
+確認 Express 無法連線時，前端不會誤判修改成功。
+
+測試前：
+
+- ID 3 金額 NT$182。
+- ID 1 金額 NT$150。
+- Dashboard 支出 NT$332。
+
+排查程序：
+
+- 使用 Get-NetTCPConnection 查詢 Port 3000。
+- 發現仍有 Node.js 程序正在監聽。
+- 當次 PID 為 4512。
+- 使用 Get-CimInstance 確認程序名稱。
+- 程序名稱為 node.exe。
+- 執行命令為 node server/server.js。
+- 停止已確認的程序。
+- 再次查詢 Port 3000。
+- 確認沒有監聽程序。
+
+測試操作：
+
+1. 保留原本已開啟的網頁。
+2. 進入 ID 3 編輯模式。
+3. 將金額從 NT$182 改成 NT$183。
+4. 不重新啟動伺服器。
+5. 點擊儲存修改。
+6. 觀察前端回應。
+
+實際結果：
+
+- 顯示 Failed to fetch。
+- 顯示編輯交易失敗。
+- 沒有顯示修改成功。
+- 編輯表單保留 NT$183。
+- 最近交易列表仍顯示 NT$182。
+- Dashboard 仍顯示 NT$332。
+- 交易總數仍為 2。
+
+測試狀態：PASS。
+
+### 連線恢復測試
+
+重新執行：
+
+`npm start`
+
+實際顯示：
+
+`Money Tracker server running at http://localhost:3000`
+
+成功恢復伺服器運作。
+
+測試狀態：PASS。
+
+### 最終資料恢復
+
+將 ID 3 金額恢復為 NT$180。
+
+最後確認：
+
+- ID 3 金額 NT$180。
+- ID 3 備註 Milestone 10-3 edit test。
+- ID 1 金額 NT$150。
+- ID 1 備註 Updated lunch test。
+- 交易總數 2。
+- 本月總收入 NT$0。
+- 本月總支出 NT$330。
+- 本月淨額 -NT$330。
+
+測試狀態：PASS。
+
+### Git 提交前檢查
+
+已執行：
+
+- `git status`
+- `git diff --check`
+- `git diff --stat`
+- `node --check public/app.js`
+- `node --check server/server.js`
+
+觀察：
+
+- public/app.js 已修改。
+- public/index.html 已修改。
+- public/style.css 已修改。
+- 未觀察到 JavaScript 基本語法錯誤。
+- 未觀察到 Git 空白格式檢查錯誤。
+
+當次差異：
+
+- 3 files changed。
+- 284 insertions。
+- 442 deletions。
+
+### 本階段尚待完成
+
+- 更新 CHANGELOG。
+- 更新 DEVELOPMENT_LOG。
+- 更新 TESTING。
+- 核對文件與實際測試。
+- 檢查最終 Git 差異。
+- 建立 Commit。
+- Push 至 GitHub。
+- 確認遠端同步。
+- 記錄實際 Commit SHA。
+
+### 本階段限制
+
+- 尚未完成所有輸入型態邊界測試。
+- 尚未完成全面自動化測試。
+- 尚未完成完整前端 CRUD。
+- 尚未完成前端刪除交易功能。
+- 尚未驗證所有網路失敗及逾時情境。
+- 尚未完成正式整合驗收。
+
+---
+
+# Historical Development Record｜原有開發歷史保留
+
+以下保留 2026-11-10 前的原有開發紀錄及詳細測試資料。
+
+注意：原始歷史章節中「目前狀態」、「尚未完成」與「待 Push」等敘述，均以當時文件撰寫時點為準。
+
+如與 2026-11-11 的最新狀態不同，應以本文件前面的 Latest Status 為準。
+
+---
+
+# Unreleased｜2026-11-10 歷史紀錄
 
 更新日期：2026-11-10
 
@@ -40,7 +664,7 @@
 
 Money Tracker 已完成基本前後端架構、SQLite 資料庫建置，以及交易資料的 GET、POST、PUT、DELETE API。
 
-目前已完成：
+當時已完成：
 
 - Node.js 與 Express 後端伺服器。
 - Health API。
@@ -61,11 +685,11 @@ Money Tracker 已完成基本前後端架構、SQLite 資料庫建置，以及�
 - Git 與 GitHub 版本控制。
 - 基本開發日誌與測試紀錄。
 
-## GitHub 同步狀態
+## GitHub 同步狀態（當時紀錄）
 
 GET、POST、PUT API 已完成既定開發階段及部分功能驗證，並提交至 GitHub。
 
-截至本文件本次更新前，最近一次已確認提交至 GitHub 的功能里程碑為 Milestone 08。
+當時最近一次已確認提交至 GitHub 的功能里程碑為 Milestone 08。
 
 Milestone 08：
 
@@ -73,7 +697,7 @@ Milestone 08：
 - 功能：PUT Transaction API。
 - 狀態：已完成 Commit 與 Push。
 
-Milestone 09：
+Milestone 09 當時狀態：
 
 - 功能：DELETE Transaction API。
 - 後端功能：已實作。
@@ -82,12 +706,12 @@ Milestone 09：
 - 刪除後資料驗證：已通過。
 - SQLite 完整性檢查：已通過。
 - 文件更新：進行中。
-- Git Commit：尚未執行。
-- GitHub Push：尚未執行。
+- Git Commit：當時尚未執行。
+- GitHub Push：當時尚未執行。
 
-Milestone 09 完成提交後，應更新本節的同步狀態及實際 Commit SHA。
+後續已於 Commit `5900b30` 完成提交。
 
-## 尚未完成的主要工作
+## 當時尚未完成的主要工作
 
 - 前端交易新增表單。
 - 前端交易修改功能。
@@ -306,7 +930,7 @@ API：
 - 外鍵檢查沒有發現違規。
 - 八個預設分類仍然存在。
 
-目前狀態：
+當時狀態：
 
 - 後端功能：已實作。
 - 正常刪除測試：PASS。
@@ -316,9 +940,13 @@ API：
 - SQLite 完整性檢查：PASS。
 - 前端 DELETE 介面：尚未實作。
 - 完整回歸測試：尚未完成。
-- Git Commit：尚未執行。
-- GitHub Push：尚未執行。
+- Git Commit：當時尚未執行。
+- GitHub Push：當時尚未執行。
 - 正式 Release：尚未發布。
+
+後續 Commit：
+
+`5900b30`
 
 ### 1.5 SQLite 資料儲存機制
 
@@ -393,7 +1021,7 @@ API：
 
 ### 1.7 前端頁面與 Dashboard
 
-已建立：
+原始靜態版面階段已建立：
 
 - `public/index.html`
 - `public/style.css`
@@ -421,12 +1049,14 @@ API：
 - 備註欄位。
 - 無交易資料時的空狀態文字。
 
-目前限制：
+原階段限制：
 
 - 財務統計尚未動態連接 SQLite。
 - 交易列表尚未動態載入 API。
 - 尚未提供新增、修改、刪除交易的操作介面。
-- 目前主要完成基礎視覺與靜態版面。
+- 當時主要完成基礎視覺與靜態版面。
+
+後續已透過 Milestone 10-1 至 10-3 實作動態查詢、新增與編輯，原限制不再全部適用。
 
 ---
 
@@ -1317,7 +1947,9 @@ Port 3001：
 
 ---
 
-## 5. Pending｜尚未完成
+## 5. Pending｜原階段待辦紀錄
+
+以下為 Milestone 09 結束前的歷史待辦清單。其中部分工作已在 Milestone 10-1 至 10-3 完成，最新未完成項目另見後續規劃。
 
 ### 5.1 Backend
 
@@ -1784,9 +2416,11 @@ Milestone：
 
 09
 
-目前 Git 狀態：
+當時 Git 狀態：
 
 本機功能及主要測試已完成，文件更新與 GitHub 提交尚待完成。
+
+後續已完成提交，Commit 為 `5900b30`。
 
 ### Development
 
@@ -1856,23 +2490,159 @@ Milestone：
 
 ### Current Status
 
+當時狀態：
+
 - DELETE API：已實作。
 - 正常刪除：PASS。
 - 負向測試：PASS。
 - 刪除後資料驗證：PASS。
 - SQLite 完整性：PASS。
 - 文件更新：進行中。
-- Git Commit：待執行。
-- GitHub Push：待執行。
+- Git Commit：當時待執行。
+- GitHub Push：當時待執行。
 - Release：尚未發布。
 
-完成 Git Commit 與 Push 後，應補充：
+後續提交結果：
 
-- 實際 Commit SHA。
-- Commit Message。
-- Push 結果。
-- Git 工作目錄狀態。
-- 完成日期。
+- Commit：`5900b30`。
+- Commit Message：`feat: implement DELETE transaction API and document tests`。
+- GitHub Push：完成。
+- main 分支：同步成功。
+- 提交後 Git 工作目錄：乾淨。
+
+---
+
+## Milestone 10-1｜Dashboard 動態整合
+
+Commit：
+
+`fd2967f`
+
+Commit Message：
+
+`feat: integrate dashboard with transactions API`
+
+### Development
+
+- 建立前端 JavaScript。
+- 使用 GET API 取得交易。
+- 透過 DOM 更新 Dashboard。
+- 計算當月收入。
+- 計算當月支出。
+- 計算當月淨額。
+- 動態顯示最近交易。
+- 加入基本載入失敗處理。
+
+### Testing
+
+- 原本 ID 1 交易成功載入。
+- 顯示 NT$150 支出。
+- 收入 NT$0。
+- 淨額 -NT$150。
+- 最近交易表格正常。
+
+### GitHub
+
+- Commit：完成。
+- Push：完成。
+- SHA：`fd2967f`。
+
+---
+
+## Milestone 10-2｜前端新增交易
+
+Commit：
+
+`bb18c64`
+
+Commit Message：
+
+`feat: implement frontend transaction creation form`
+
+### Development
+
+- 新增交易表單。
+- 收支類型選擇。
+- 動態分類選擇。
+- 金額欄位。
+- 日期欄位。
+- 備註欄位。
+- POST API 整合。
+- 成功提示。
+- Dashboard 更新。
+- 交易列表更新。
+- 基本表單驗證。
+
+### Testing
+
+- 成功新增 ID 3。
+- 新增 NT$120 支出。
+- 交易總數增加至 2。
+- 本月支出更新為 NT$270。
+- 重新整理後資料仍存在。
+- 零元測試通過。
+- 小數測試通過。
+- 分類切換測試通過。
+
+### GitHub
+
+- Commit：完成。
+- Push：完成。
+- SHA：`bb18c64`。
+
+---
+
+## Milestone 10-3｜前端編輯交易
+
+整理日期：2026-11-11
+
+Git 狀態：
+
+尚未完成本階段 Commit 與 Push。
+
+### Development
+
+- 交易清單新增編輯按鈕。
+- 點擊後顯示編輯表單。
+- 自動載入原始交易。
+- 支援修改分類。
+- 支援修改金額。
+- 支援修改日期。
+- 支援修改備註。
+- 串接 PUT API。
+- 新增取消編輯。
+- 更新 Dashboard。
+- 更新最近交易。
+- 加入基本錯誤處理。
+
+### Testing
+
+- 編輯資料載入：PASS。
+- 正常修改：PASS。
+- Dashboard 同步：PASS。
+- 重新整理後資料保留：PASS。
+- 取消編輯：PASS。
+- 零元阻擋：PASS。
+- 小數阻擋：PASS。
+- 不存在交易 HTTP 404：PASS。
+- 前端連線失敗：PASS。
+- 測試資料恢復：PASS。
+
+### Final Test Data
+
+- ID 3：NT$180。
+- ID 1：NT$150。
+- 總筆數：2。
+- 本月收入：NT$0。
+- 本月支出：NT$330。
+- 本月淨額：-NT$330。
+
+### GitHub
+
+- Commit：待執行。
+- Push：待執行。
+- Commit SHA：尚未取得。
+- Release：尚未發布。
 
 ---
 
@@ -1904,7 +2674,11 @@ Milestone：
 
 目前狀態：
 
-後端功能與本階段主要驗證完成，文件與 GitHub 提交進行中。
+已完成並提交 GitHub。
+
+Commit：
+
+`5900b30`
 
 已完成：
 
@@ -1920,24 +2694,15 @@ Milestone：
 - 外鍵檢查。
 - 預設分類檢查。
 - 舊版伺服器排錯。
-
-尚待完成：
-
-- 完成 CHANGELOG.md 更新。
-- 完成 DEVELOPMENT_LOG.md 更新。
-- 完成 TESTING.md 更新。
-- 核對文件與實際測試。
-- Git 差異檢查。
+- 開發文件更新。
 - Git Commit。
 - Git Push。
-- 確認 Git 工作目錄乾淨。
-- 補充 Commit SHA。
 
 ## Milestone 10｜前端 CRUD 整合
 
 目前狀態：
 
-尚未開始。
+部分完成，持續開發中。
 
 ### Planned Features
 
@@ -1973,7 +2738,7 @@ Milestone：
 
 ### Acceptance Criteria
 
-本里程碑的完成條件：
+本里程碑的完整完成條件：
 
 1. 使用者可透過網頁新增交易。
 2. 使用者可透過網頁修改交易。
@@ -1986,11 +2751,17 @@ Milestone：
 9. 更新技術與測試文件。
 10. 完成 Git Commit 與 Push。
 
-上述均為預定驗收標準，尚未宣稱完成。
+截至 2026-11-11：
+
+- 查詢：已完成。
+- 新增：已完成。
+- 修改：已完成本機實作與既定測試。
+- 刪除：尚未完成前端介面。
+- 完整驗收：尚未完成。
 
 ---
 
-## Milestone 11｜財務統計與圖表
+## Milestone 10-4｜前端刪除交易
 
 目前狀態：
 
@@ -1998,11 +2769,56 @@ Milestone：
 
 ### Planned Features
 
-- Dashboard 動態載入。
-- 本月總收入。
-- 本月總支出。
-- 本月收支淨額。
-- 最近交易紀錄。
+- 在交易列表新增刪除按鈕。
+- 確認交易 ID。
+- 刪除前顯示確認訊息。
+- 使用者可選擇取消刪除。
+- 透過 Fetch API 發送 DELETE。
+- 成功後顯示刪除訊息。
+- 成功後重新查詢交易。
+- 更新 Dashboard。
+- 更新交易清單。
+- 處理 HTTP 404。
+- 處理 API 無法連線。
+- 防止重複送出刪除請求。
+- 保護其他交易不受影響。
+
+### Planned Testing
+
+- 正常刪除專用測試交易。
+- 刪除前取消。
+- 刪除後列表更新。
+- 刪除後 Dashboard 更新。
+- 重複刪除不存在的交易。
+- 無法連線時顯示錯誤。
+- 確認其他交易完整。
+- 重新整理後確認結果。
+- SQLite Integrity Check。
+- SQLite Foreign Key Check。
+
+### Acceptance Criteria
+
+- 前端可成功刪除指定交易。
+- 取消刪除不影響資料庫。
+- 刪除操作具確認機制。
+- 操作完成後畫面與 SQLite 一致。
+- 錯誤處理符合預期。
+- 主要測試通過。
+- 文件更新。
+- Git Commit 與 Push 完成。
+
+---
+
+## Milestone 11｜財務統計與圖表
+
+目前狀態：
+
+進階分析尚未開始。
+
+目前已有基本 Dashboard 收入、支出及淨額統計；以下規劃聚焦進階分析與圖表。
+
+### Planned Features
+
 - 收入與支出分類統計。
 - SQL 聚合查詢。
 - SQL GROUP BY。
@@ -2030,7 +2846,7 @@ Milestone：
 
 ### Acceptance Criteria
 
-- Dashboard 能讀取真實資料。
+- 進階統計能讀取真實資料。
 - 統計結果與 SQLite 一致。
 - 圖表能正確顯示。
 - 主要資料變動能反映於統計。
@@ -2333,27 +3149,78 @@ Commit 訊息採用一致命名方式：
 - SQLite 交易查詢與操作。
 - HTTP 錯誤回應。
 
+## public/index.html
+
+用途：
+
+- Money Tracker 網頁結構。
+- Dashboard。
+- 交易新增及編輯表單。
+- 最近交易列表。
+- 操作按鈕與訊息區域。
+
+## public/style.css
+
+用途：
+
+- 深色主題。
+- Dashboard 卡片樣式。
+- 表單排版。
+- 按鈕設計。
+- 交易列表樣式。
+- 成功及錯誤訊息樣式。
+
+## public/app.js
+
+用途：
+
+- 前端資料載入。
+- Fetch API。
+- Dashboard 計算。
+- 動態交易列表。
+- 表單事件。
+- 新增交易。
+- 編輯交易。
+- 基本輸入驗證。
+- 錯誤處理。
+- 前端資料同步。
+
 ---
 
 # Current Project Summary｜目前專案總結
 
-截至 2026-11-10：
+截至 2026-11-11：
 
 Money Tracker 已完成本機單人個人財務管理系統的基礎全端架構。
 
-後端使用 Node.js、Express 及 SQLite，已具備分類查詢及交易資料 GET、POST、PUT、DELETE 的基本操作能力。
+後端使用 Node.js、Express 及 SQLite，已具備分類查詢與交易資料 GET、POST、PUT、DELETE 的基本操作能力。
 
-前端已完成深色主題 Dashboard、財務摘要卡片與最近交易列表的靜態版面。
+前端已完成深色主題 Dashboard、動態財務統計、最近交易列表、交易新增表單，以及交易編輯表單。
 
 資料庫已建立 categories 與 transactions 資料表，並透過主鍵、外鍵及基本資料驗證維持資料關聯。
 
-已實際完成主要 API 功能測試、部分負向測試、交易資料持久化驗證，以及 DELETE API 的資料完整性檢查。
+目前已完成主要 API 功能測試、既定負向測試、交易資料持久化驗證、DELETE API 資料完整性檢查、Dashboard 動態整合測試，以及前端新增和編輯交易的主要驗證。
 
-Milestone 08 已完成 Git Commit 與 GitHub Push。
+Milestone 09 已完成 Commit `5900b30`。
 
-Milestone 09 的 DELETE API 已完成本機實作及主要測試，尚待完成文件更新、Git Commit 與 GitHub Push。
+Milestone 10-1 已完成 Commit `fd2967f`。
 
-接下來的主要工作為前端 CRUD 整合、動態財務統計、進階查詢、CSV 匯出及完整系統驗收。
+Milestone 10-2 已完成 Commit `bb18c64`。
+
+Milestone 10-3 已完成本機功能與既定測試，尚未完成正式 Git Commit 與 GitHub Push。
+
+截至最後一次測試畫面：
+
+- ID 3：NT$180。
+- ID 1：NT$150。
+- 本月總收入：NT$0。
+- 本月總支出：NT$330。
+- 本月收支淨額：-NT$330。
+- 交易總數：2。
+
+前端刪除交易操作尚未實作。
+
+接下來的主要工作為 Milestone 10-3 的文件與 Git 提交、Milestone 10-4 前端刪除交易、進階財務統計、交易篩選、CSV 匯出及完整系統驗收。
 
 目前尚未發布正式穩定版本。
 
@@ -2374,3 +3241,68 @@ Milestone 09 的 DELETE API 已完成本機實作及主要測試，尚待完成�
 當專案正式發布版本時，應依據實際完成內容整理版本更新紀錄，並建立適當的 Git Tag 或 GitHub Release。
 
 Money Tracker 將持續以可驗證、可追溯、逐步完成的方式開發與維護。
+
+---
+
+# Documentation Revision Notes｜本次文件修訂紀錄
+
+修訂日期：2026-11-11
+
+本次整理以 GitHub 上的完整歷史 CHANGELOG 為基礎。
+
+修訂內容：
+
+1. 保留原有專案初始化紀錄。
+2. 保留 Express 後端建置紀錄。
+3. 保留前端首頁建置紀錄。
+4. 保留靜態 Dashboard 建置紀錄。
+5. 保留 SQLite 初始化與資料表設計紀錄。
+6. 保留分類查詢 API 紀錄。
+7. 保留交易 GET API 紀錄。
+8. 保留交易 POST API 紀錄。
+9. 保留交易 PUT API 紀錄。
+10. 保留交易 DELETE API 紀錄。
+11. 保留 POST 既定正負向測試紀錄。
+12. 保留 PUT 既定正負向測試紀錄。
+13. 保留 DELETE 既定正負向測試紀錄。
+14. 保留 SQLite 完整性檢查紀錄。
+15. 保留 Foreign Key Check 紀錄。
+16. 保留原有分類資料。
+17. 保留 PUT 路由排錯過程。
+18. 保留 DELETE 路由排錯過程。
+19. 保留 Port 3000、3001 的程序排查歷程。
+20. 保留所有已確認的歷史 Commit SHA。
+21. 補記 Milestone 09 的 GitHub 提交結果。
+22. 新增 Milestone 10-1 Dashboard 動態整合紀錄。
+23. 新增 Milestone 10-2 前端新增交易紀錄。
+24. 新增 Milestone 10-3 前端編輯交易紀錄。
+25. 補充 Dashboard 前後數據變化。
+26. 補充前端資料持久化測試。
+27. 補充前端零元及小數驗證。
+28. 補充收入分類選單切換驗證。
+29. 補充前端取消編輯驗證。
+30. 補充 PUT 不存在交易 HTTP 404 驗證。
+31. 補充 PowerShell JSON 格式問題。
+32. 補充伺服器中斷時的錯誤處理。
+33. 補充 Node.js PID 4512 的排查紀錄。
+34. 補充前端 Failed to fetch 測試。
+35. 補充伺服器恢復測試。
+36. 補充測試資料恢復結果。
+37. 更新最新專案狀態。
+38. 更新 Milestone 10 的進度。
+39. 新增 Milestone 10-4 前端刪除交易規劃。
+40. 修正進階財務統計階段的功能界線。
+41. 保留版本管理規範。
+42. 保留資料保護原則。
+43. 補充前端主要檔案的文件索引。
+44. 明確標示未執行的完整回歸測試。
+45. 明確標示尚未完成的 Release。
+46. 明確標示 Milestone 10-3 尚未提交。
+47. 區分歷史開發狀態與最新狀態。
+48. 不將測試快照當成永久財務數據。
+49. 不將本機功能完成視為 GitHub 已同步。
+50. 保留後續開發的可追溯性。
+
+本次 CHANGELOG 更新完成文字整理，但在實際執行 Git Commit 與 Push 之前，不宣稱已同步至 GitHub。
+
+本次修訂不代表 Money Tracker 已完成全部功能或正式產品驗收。
