@@ -373,3 +373,451 @@ section p {
 .delete-feedback.error {
   color: #fb7185;
 }
+
+/* ===== Milestone 11-1：財務分析 ===== */
+
+.analytics-section {
+  margin-top: 28px;
+}
+
+.analytics-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 24px 0;
+}
+
+.analytics-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.analytics-filter label {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.analytics-filter input,
+.analytics-filter select {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  color-scheme: dark;
+  font: inherit;
+}
+
+.analytics-filter input:focus,
+.analytics-filter select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.analytics-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.analytics-summary {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.analytics-summary h3 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.analytics-summary strong {
+  font-size: 25px;
+  overflow-wrap: anywhere;
+}
+
+.analytics-income {
+  color: #4ade80;
+}
+
+.analytics-expense {
+  color: #fb7185;
+}
+
+.analytics-balance {
+  color: #38bdf8;
+}
+
+.analytics-category {
+  margin-top: 18px;
+}
+
+.analytics-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.analytics-category-header span {
+  color: var(--muted);
+}
+
+.analytics-bar-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #334155;
+}
+
+.analytics-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+.analytics-empty {
+  color: var(--muted);
+  padding: 16px 0;
+}
+
+@media (max-width: 600px) {
+  .analytics-toolbar {
+    flex-direction: column;
+  }
+
+  .analytics-filter {
+    width: 100%;
+  }
+
+  .analytics-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Milestone 11-2：圖表視覺化 ===== */
+
+.analytics-charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.analytics-chart-card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.analytics-chart-card h3 {
+  margin: 0 0 4px;
+  font-size: 17px;
+}
+
+.analytics-chart-description {
+  color: var(--muted);
+  margin: 0 0 20px;
+  font-size: 13px;
+}
+
+.analytics-donut-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  min-height: 160px;
+}
+
+.analytics-donut-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 156px;
+  height: 156px;
+  flex: 0 0 156px;
+  border-radius: 50%;
+}
+
+.analytics-donut-ring::before {
+  content: "";
+  position: absolute;
+  inset: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.analytics-donut-center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: 115px;
+  text-align: center;
+}
+
+.analytics-donut-center span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.analytics-donut-center strong {
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.analytics-chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 1 145px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.analytics-legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.analytics-legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  margin-top: 4px;
+  border-radius: 3px;
+}
+
+.analytics-compare-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 9px;
+}
+
+.analytics-compare-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+  font-size: 14px;
+}
+
+.analytics-compare-header strong {
+  overflow-wrap: anywhere;
+}
+
+.analytics-compare-track {
+  height: 20px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #334155;
+}
+
+.analytics-compare-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.2s ease;
+}
+
+.analytics-compare-fill.is-income {
+  background: #4ade80;
+}
+
+.analytics-compare-fill.is-expense {
+  background: #fb7185;
+}
+
+.analytics-compare-note {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .analytics-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .analytics-chart-card {
+    padding: 16px;
+  }
+
+  .analytics-donut-ring {
+    width: 140px;
+    height: 140px;
+    flex-basis: 140px;
+  }
+
+  .analytics-donut-ring::before {
+    inset: 25px;
+  }
+}
+
+/* ===== Milestone 11-3：六個月收支趨勢 ===== */
+
+.analytics-trend-section {
+  margin-top: 24px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.analytics-trend-heading h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.analytics-trend-heading p,
+.analytics-trend-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.analytics-trend-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 18px 0 16px;
+  font-size: 13px;
+}
+
+.analytics-trend-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.analytics-trend-dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+
+.analytics-trend-dot.is-income,
+.analytics-trend-bar.is-income {
+  background: #4ade80;
+}
+
+.analytics-trend-dot.is-expense,
+.analytics-trend-bar.is-expense {
+  background: #fb7185;
+}
+
+.analytics-trend-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 4px 0 12px;
+}
+
+.analytics-trend-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(108px, 1fr));
+  gap: 14px;
+  min-width: 718px;
+}
+
+.analytics-trend-month {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  min-width: 0;
+  text-align: center;
+}
+
+.analytics-trend-bars {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  height: 165px;
+  padding: 0 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.analytics-trend-bar-track {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: flex-end;
+  overflow: hidden;
+  border-radius: 6px 6px 0 0;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.analytics-trend-bar {
+  width: 100%;
+  height: 0;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.2s ease;
+}
+
+.analytics-trend-month-label {
+  margin-top: 7px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.analytics-trend-data {
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.analytics-trend-net {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.analytics-trend-net.is-negative {
+  color: #fb7185;
+}
+
+.analytics-trend-net.is-positive {
+  color: #4ade80;
+}
+
+.analytics-trend-note {
+  margin-top: 6px;
+}
+
+@media (max-width: 600px) {
+  .analytics-trend-section {
+    padding: 16px;
+  }
+}

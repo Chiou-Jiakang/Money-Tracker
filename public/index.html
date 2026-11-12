@@ -10,6 +10,7 @@
 
     <!-- 前端功能：Dashboard、Create、Update -->
     <script src="/app.js" defer></script>
+    <script src="/analytics.js" defer></script>
   </head>
 
   <body>
@@ -42,6 +43,112 @@
             <span>Net Balance</span>
           </article>
         </div>
+      </section>
+
+      <!-- Milestone 11-1：每月財務分析 -->
+      <section class="analytics-section" aria-labelledby="analytics-heading">
+        <h2 id="analytics-heading">財務分析 Analytics</h2>
+        <p>依月份查看收支統計、分類金額與占比。</p>
+
+        <div class="analytics-toolbar">
+          <div class="analytics-filter">
+            <label for="analytics-month">統計月份</label>
+            <input type="month" id="analytics-month" />
+          </div>
+
+          <div class="analytics-filter">
+            <label for="analytics-type">分類統計類型</label>
+            <select id="analytics-type">
+              <option value="expense" selected>支出分類</option>
+              <option value="income">收入分類</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="analytics-stats">
+          <article class="analytics-summary">
+            <h3>該月總收入</h3>
+            <strong id="analytics-income" class="analytics-income">—</strong>
+          </article>
+
+          <article class="analytics-summary">
+            <h3>該月總支出</h3>
+            <strong id="analytics-expense" class="analytics-expense">—</strong>
+          </article>
+
+          <article class="analytics-summary">
+            <h3>該月收支淨額</h3>
+            <strong id="analytics-balance" class="analytics-balance">—</strong>
+          </article>
+        </div>
+
+        <h3>分類金額與占比</h3>
+
+        <p id="analytics-status" role="status" aria-live="polite">
+          正在等待交易資料...
+        </p>
+
+        <div id="analytics-categories">
+          <p class="analytics-empty">正在載入分類分析...</p>
+        </div>
+
+        <!-- Milestone 11-2：財務圖表 -->
+        <div class="analytics-charts" aria-label="財務統計圖表">
+          <article class="analytics-chart-card">
+            <h3>分類占比環形圖</h3>
+            <p class="analytics-chart-description">
+              依目前選取月份與分類類型顯示。
+            </p>
+            <div id="analytics-donut" class="analytics-donut-content">
+              <p class="analytics-empty">正在載入圖表...</p>
+            </div>
+          </article>
+
+          <article class="analytics-chart-card">
+            <h3>收入與支出比較</h3>
+            <p class="analytics-chart-description">
+              比較所選月份的總收入與總支出。
+            </p>
+
+            <div id="analytics-comparison">
+              <p class="analytics-empty">正在載入圖表...</p>
+            </div>
+          </article>
+        </div>
+
+        <!-- Milestone 11-3：所選月份往前六個月的收支趨勢 -->
+        <section
+          class="analytics-trend-section"
+          aria-labelledby="analytics-trend-heading"
+        >
+          <div class="analytics-trend-heading">
+            <h3 id="analytics-trend-heading">最近六個月收支趨勢</h3>
+            <p>以「統計月份」為終點，顯示當月及前五個月的收入、支出與淨額。</p>
+          </div>
+
+          <div class="analytics-trend-legend" aria-label="圖表顏色說明">
+            <span
+              ><i class="analytics-trend-dot is-income" aria-hidden="true"></i
+              >收入</span
+            >
+            <span
+              ><i class="analytics-trend-dot is-expense" aria-hidden="true"></i
+              >支出</span
+            >
+          </div>
+
+          <div
+            id="analytics-trend"
+            class="analytics-trend-scroll"
+            aria-live="polite"
+          >
+            <p class="analytics-empty">正在載入六個月趨勢...</p>
+          </div>
+
+          <p class="analytics-trend-note">
+            圖表以六個月內最高的單月收入或支出為高度基準；小螢幕可左右捲動。
+          </p>
+        </section>
       </section>
 
       <!-- 3. 新增 / 編輯共用表單：編輯時由 JS 切換標題、提示與按鈕 -->

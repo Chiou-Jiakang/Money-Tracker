@@ -276,6 +276,13 @@ async function loadTransactions() {
     updateDashboard(allTransactions);
     renderTransactions(allTransactions);
 
+    // Milestone 11-1：通知財務分析更新
+    document.dispatchEvent(
+      new CustomEvent("moneytracker:transactions-loaded", {
+        detail: { transactions: allTransactions },
+      }),
+    );
+
     console.log("Money Tracker transactions loaded:", allTransactions.length);
 
     return true;
@@ -294,6 +301,7 @@ async function loadTransactions() {
     );
 
     transactionsStatus.textContent = `資料讀取失敗：${error.message}`;
+    document.dispatchEvent(new Event("moneytracker:transactions-error"));
 
     return false;
   }
