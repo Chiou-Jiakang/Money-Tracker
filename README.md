@@ -134,6 +134,37 @@ Money Tracker 是一套使用 **HTML、CSS、JavaScript、Node.js、Express 與 
 - 小螢幕可水平捲動圖表。
 - 新增、修改、刪除交易後重新計算趨勢。
 
+
+### 2.7 交易進階篩選與搜尋
+
+Milestone 12 新增交易紀錄進階篩選功能，方便使用者依不同條件查找收入及支出紀錄。
+
+支援以下篩選條件：
+
+- 開始日期與結束日期。
+- 收入或支出類型。
+- 指定交易分類。
+- 最低交易金額。
+- 最高交易金額。
+- 交易分類名稱或備註關鍵字。
+
+主要功能：
+
+- 支援多項篩選條件組合查詢。
+- 提供「套用篩選」及「清除條件」按鈕。
+- 顯示符合條件的交易紀錄。
+- 沒有符合結果時，顯示空清單。
+- 對不合法的查詢條件提供錯誤回應。
+- 篩選結果與完整交易資料分開管理。
+- 保留既有交易新增、編輯及刪除功能。
+
+進階篩選透過既有的 GET /api/transactions API 執行。
+
+篩選交易清單不會直接修改 SQLite 交易資料，也不應改變 Dashboard 與 Analytics 使用的完整交易資料來源。
+
+本階段已通過核心 API 測試與唯讀自動化檢查，但最新版完整瀏覽器端對端驗收仍待補充。
+
+
 ## 三、技術架構
 
 | 層級            | 使用技術                             |
@@ -221,6 +252,34 @@ API 使用 JSON 傳遞資料。
 交易新增及修改操作會進行資料驗證，包含交易分類、金額、日期及備註等欄位。
 
 部分錯誤情境會回傳對應的 HTTP 狀態碼，例如 400、404 或 500。
+
+### 4.1 交易進階篩選參數
+
+Milestone 12 擴充 `GET /api/transactions`，支援以下 Query Parameters：
+
+| 參數 | 說明 |
+|---|---|
+| `from` | 起始日期，格式 YYYY-MM-DD |
+| `to` | 結束日期，格式 YYYY-MM-DD |
+| `type` | `income` 或 `expense` |
+| `category_id` | 指定交易分類 ID |
+| `min_amount` | 最低交易金額 |
+| `max_amount` | 最高交易金額 |
+| `keyword` | 搜尋分類名稱或交易備註 |
+
+可以組合多個條件，例如：
+
+`GET /api/transactions?type=expense&min_amount=100`
+
+在 PowerShell 中可使用：
+
+`Invoke-RestMethod -Uri "http://127.0.0.1:3000/api/transactions?type=expense&min_amount=100"`
+
+查無符合條件的交易時，正常回傳空資料清單。
+
+不合法日期、金額上下限顛倒或未知查詢參數，會回傳 HTTP 400。
+
+篩選查詢只讀取交易資料，不會直接修改 SQLite。
 
 ## 五、本機執行方式
 
@@ -327,46 +386,80 @@ API 使用 JSON 傳遞資料。
 
 目前已有主要功能的手動測試證據，但完整的自動化測試與系統驗收仍在後續規劃中。
 
+
+### 6.5 Milestone 12 唯讀檢查
+
+2026-11-13 已於本機執行 Milestone 12 唯讀自動化檢查。
+
+實際結果：**20/20 PASS，0 FAIL**。
+
+檢查範圍包含：
+
+- JavaScript 語法與關鍵程式結構。
+- API 健康、分類及交易讀取。
+- 日期、類型、分類、金額與關鍵字篩選。
+- 不合法查詢參數的 HTTP 400 回應。
+- 檢查前後的交易資料一致性。
+
+測試程式名稱：
+
+`Money-Tracker-M12-ReadOnly-Check.mjs`
+
+目前該檔案儲存在本機 `C:\Projects`，不在 Git 專案內。
+
+在 Money Tracker 專案根目錄執行：
+
+`node C:\Projects\Money-Tracker-M12-ReadOnly-Check.mjs`
+
+執行前須確保本機 Express 伺服器已啟動。
+
+此程式不執行 POST、PUT 或 DELETE，但只涵蓋指定的唯讀測試情境。
+
+**20/20 PASS 不代表已完成完整瀏覽器端對端驗收。**
+
+最新版前端互動、網路故障時的 CRUD 操作、行動裝置及安全性驗收仍待補充。
+
+詳細測試證據與 NOT RUN 項目請參閱 `docs/TESTING.md` 的 Milestone 12 章節。
+
 ## 七、目前開發進度
 
 ### 已完成
 
-- Milestone 01～09：環境、資料庫及 REST API 基礎。
-- Milestone 10-1：前端 Dashboard 與交易資料整合。
-- Milestone 10-2：前端新增交易。
-- Milestone 10-3：前端編輯交易。
-- Milestone 10-4：前端刪除交易。
+- Milestone 01～09：開發環境、SQLite 資料庫及 REST API。
+- Milestone 10：交易 CRUD 與 Dashboard 前端整合。
 - Milestone 11-1：每月財務統計與分類分析。
-- Milestone 11-2：環形圖與收入支出比較圖。
+- Milestone 11-2：分類環形圖與收入支出比較圖。
 - Milestone 11-3：最近六個月收支趨勢。
+- Milestone 11-4：文件整理、Git Commit 與 GitHub Push。
+- Milestone 12-1：後端進階交易篩選 API。
+- Milestone 12-2：前端進階篩選搜尋與 CRUD 狀態修正。
+- Milestone 12-3：本機唯讀自動化檢查，20/20 PASS。
 
-上述功能已完成主要本機實作及既定手動測試。
+以上代表對應的核心功能或階段工作已完成，不表示所有端對端、相容性與安全性驗收均已通過。
 
 ### 進行中
 
-**Milestone 11-4：文件整理與版本管理**
+**Milestone 12-4：文件整理與版本管理**
 
-包含：
+本階段更新的文件包括：
 
-- 更新 CHANGELOG。
-- 更新 DEVELOPMENT_LOG。
-- 更新 TESTING。
-- 更新 README。
-- 核對文件與實際功能。
-- 執行最終檢查。
-- 建立 Git Commit。
-- Push 至 GitHub。
+- CHANGELOG.md
+- docs/DEVELOPMENT_LOG.md
+- docs/TESTING.md
+- README.md
+
+本階段的程式與文件由 Git 統一管理；實際提交與遠端同步狀態請以 GitHub main 分支的最新 Commit 為準。
 
 ### 尚未完成
 
-- 交易日期、分類及金額的進階篩選。
+- 最新版本完整的瀏覽器端對端驗收。
 - CSV 資料匯出。
-- 完整使用者自訂分類管理。
-- 更完整的自動化測試。
-- 大量資料效能測試。
-- 完整的異常與安全性測試。
+- 使用者自訂分類管理。
+- 更完整且可重現的自動化測試。
+- 大量交易資料的效能測試。
+- 完整異常處理及安全性驗收。
 - 多瀏覽器及多裝置相容性驗收。
-- 正式版本發布及部署。
+- 正式版本發布與部署。
 
 ## 八、版本管理與專案文件
 
@@ -376,54 +469,77 @@ GitHub Repository：
 
 https://github.com/Chiou-Jiakang/Money-Tracker
 
-Milestone 10-4 已提交並推送至 GitHub。
+### 已確認的版本基準
 
-已確認的前一個提交基準：
+**Milestone 10-4**
 
-`d4148f1`
+Commit：`d4148f1`
 
 Commit Message：
 
 `feat: implement frontend transaction deletion and document tests`
 
-Milestone 11 的功能開發與主要測試已完成，目前仍在進行文件整理及正式版本提交。
+**Milestone 11**
 
-本專案 `package.json` 雖然設定了版本號 `1.0.0`，但不代表目前已發布正式 GitHub Release。
+Commit：`f17c61c`
+
+Commit Message：
+
+`feat: implement financial analytics and visualization with documentation`
+
+Milestone 11 已完成 Git Commit、Push，並確認本機與 GitHub 遠端版本同步。
+
+### Milestone 12 版本狀態
+
+- 開發基準：`f17c61c`
+- 目前狀態：Unreleased
+- 核心搜尋功能：已實作
+- 唯讀自動化檢查：20/20 PASS
+- 完整瀏覽器端對端驗收：尚未完成
+- 文件整理：已納入本階段更新
+- Milestone 12 Git Commit：請參閱 Git 提交歷史
+- Milestone 12 GitHub 同步：請參閱遠端 main 分支
+
+正式提交完成前，不預先填寫 Milestone 12 的 Commit ID。
+
+本專案 `package.json` 中的版本號 `1.0.0`，不代表已發布正式 GitHub Release。
 
 ### 文件用途
 
 [CHANGELOG.md](CHANGELOG.md)
 
-記錄功能變更及版本更新。
+記錄功能變更、版本更新及階段開發成果。
 
 [DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md)
 
-記錄實作細節、架構設計、開發歷程與技術決策。
+記錄架構設計、實作過程、技術決策、問題排查及修正歷程。
 
 [TESTING.md](docs/TESTING.md)
 
-記錄測試條件、執行方式、預期結果、實際結果及測試狀態。
+記錄測試條件、實際結果及 PASS、FAIL、NOT RUN 狀態。
 
-本專案保留歷史紀錄，並區分已完成、進行中及尚未執行的項目，以維持開發過程的可追溯性。
+本專案持續保留重要歷史紀錄，以維持開發工作的可追溯性。
 
 ## 九、後續開發方向
 
-接下來的開發重點包括：
+完成 Milestone 12-4 的文件與版本管理後，後續重點包括：
 
-1. 完成 Milestone 11-4 的文件及版本提交。
-2. 建立交易進階查詢與篩選功能。
-3. 新增 CSV 資料匯出。
-4. 改善使用者介面與操作體驗。
-5. 補強錯誤處理、資料驗證及自動化測試。
-6. 進行更完整的系統驗收。
-7. 規劃正式版本發布。
+1. 補充最新版搜尋介面的端對端驗收。
+2. 新增 CSV 資料匯出。
+3. 改善篩選操作與使用者介面體驗。
+4. 擴充自動化測試及測試腳本版本管理。
+5. 完善自訂分類管理能力。
+6. 進行效能、異常及安全性測試。
+7. 規劃完整產品驗收及正式版本發布。
+
+功能規劃不代表已經實作或通過驗收。
 
 ## 十、目前專案狀態總結
 
-Money Tracker 已完成基本全端架構、SQLite 交易資料儲存、完整交易 CRUD、財務 Dashboard、每月分類分析與最近六個月收支趨勢。
+Money Tracker 已完成本機全端架構、SQLite 持久化儲存、交易 CRUD、財務 Dashboard、每月分類分析、財務圖表、最近六個月收支趨勢，以及進階交易篩選搜尋的主要功能。
 
-目前系統可在本機執行，並已通過既定主要功能測試。
+Milestone 12 已取得本機唯讀自動化檢查 20/20 PASS，並確認當次檢查前後交易資料保持一致。
 
-但進階查詢、CSV 匯出及完整系統驗收仍未完成，因此目前仍屬於持續開發中的個人全端專案。
+本階段的程式與文件更新已整理，版本提交及同步結果以 GitHub 紀錄為準。完整瀏覽器端對端驗收、CSV 匯出、系統安全性及正式部署尚未完成。
 
-後續將持續以功能實作、測試驗證、文件記錄及 Git 版本管理的方式推進開發。
+因此，本專案目前仍屬於持續開發中的單人本機財務管理應用程式，而非已完成全面驗收的正式發布產品。

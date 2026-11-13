@@ -63,12 +63,167 @@ app.get("/api/categories", (req, res) => {
   }
 });
 
-// 6. 取得所有交易紀錄
+// 6. 取得交易紀錄；不帶參數時仍回傳全部交易
 app.get("/api/transactions", (req, res) => {
   try {
-    const transactions = db
-      .prepare(
-        `
+    const supported = new Set([
+      "from",
+      "to",
+      "type",
+      "category_id",
+      "min_amount",
+      "max_amount",
+      "keyword",
+    ]);
+
+    // 不接受未知或重複的篩選參數
+    for (const [key, value] of Object.entries(req.query)) {
+      if (!supported.has(key) || typeof value !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid filter parameter: ${key}`,
+        });
+      }
+    }
+
+    const from = req.query.from?.trim();
+    const to = req.query.to?.trim();
+    const type = req.query.type?.trim();
+    const category = req.query.category_id?.trim();
+    const minimum = req.query.min_amount?.trim();
+    const maximum = req.query.max_amount?.trim();
+    const keyword = req.query.keyword?.trim();
+
+    // 日期必須是真實存在的 YYYY-MM-DD
+    const isValidDate = (value) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        return false;
+      }
+
+      const parsed = new Date(`${value}T00:00:00.000Z`);
+
+      return (
+        !Number.isNaN(parsed.getTime()) &&
+        parsed.toISOString().slice(0, 10) === value
+      );
+    };
+
+    if (
+      (from !== undefined && !isValidDate(from)) ||
+      (to !== undefined && !isValidDate(to))
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid date filter (use YYYY-MM-DD)",
+      });
+    }
+
+    if (from && to && from > to) {
+      return res.status(400).json({
+        success: false,
+        message: "Start date cannot be later than end date",
+      });
+    }
+
+    if (type !== undefined && type !== "income" && type !== "expense") {
+      return res.status(400).json({
+        success: false,
+        message: "Type must be income or expense",
+      });
+    }
+
+    // 分類必須是正整數；金額下限與上限允許 0
+    const parseInteger = (raw, allowZero) => {
+      if (raw === undefined) {
+        return null;
+      }
+
+      if (!/^(0|[1-9]\d*)$/.test(raw)) {
+        return NaN;
+      }
+
+      const number = Number(raw);
+
+      if (!Number.isSafeInteger(number) || (!allowZero && number === 0)) {
+        return NaN;
+      }
+
+      return number;
+    };
+
+    const categoryId = parseInteger(category, false);
+    const minAmount = parseInteger(minimum, true);
+    const maxAmount = parseInteger(maximum, true);
+
+    if ([categoryId, minAmount, maxAmount].some(Number.isNaN)) {
+      return res.status(400).json({
+        success: false,
+        message: "Category and amount filters must be valid integers",
+      });
+    }
+
+    if (minAmount !== null && maxAmount !== null && minAmount > maxAmount) {
+      return res.status(400).json({
+        success: false,
+        message: "Minimum amount cannot exceed maximum amount",
+      });
+    }
+
+    if (keyword !== undefined && keyword.length > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Keyword must not exceed 100 characters",
+      });
+    }
+
+    // 以參數化 SQL 建立查詢，避免將輸入直接串接到 SQL
+    const conditions = [];
+    const params = [];
+
+    if (from !== undefined) {
+      conditions.push("t.transaction_date >= ?");
+      params.push(from);
+    }
+
+    if (to !== undefined) {
+      conditions.push("t.transaction_date <= ?");
+      params.push(to);
+    }
+
+    if (type !== undefined) {
+      conditions.push("c.type = ?");
+      params.push(type);
+    }
+
+    if (categoryId !== null) {
+      conditions.push("t.category_id = ?");
+      params.push(categoryId);
+    }
+
+    if (minAmount !== null) {
+      conditions.push("t.amount >= ?");
+      params.push(minAmount);
+    }
+
+    if (maxAmount !== null) {
+      conditions.push("t.amount <= ?");
+      params.push(maxAmount);
+    }
+
+    // 搜尋分類名稱與備註
+    if (keyword) {
+      conditions.push(
+        "(instr(lower(c.name), lower(?)) > 0 OR " +
+          "instr(lower(COALESCE(t.note, '')), lower(?)) > 0)",
+      );
+
+      params.push(keyword, keyword);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const sql = `
       SELECT
         t.id,
         t.category_id,
@@ -81,14 +236,15 @@ app.get("/api/transactions", (req, res) => {
       FROM transactions AS t
       INNER JOIN categories AS c
         ON t.category_id = c.id
+      ${whereClause}
       ORDER BY
         t.transaction_date DESC,
         t.id DESC
-    `,
-      )
-      .all();
+    `;
 
-    res.json({
+    const transactions = db.prepare(sql).all(...params);
+
+    return res.json({
       success: true,
       count: transactions.length,
       data: transactions,
@@ -96,7 +252,7 @@ app.get("/api/transactions", (req, res) => {
   } catch (error) {
     console.error("Failed to fetch transactions:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch transactions",
     });

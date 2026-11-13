@@ -29,7 +29,18 @@ const noteElement = document.getElementById("transaction-note");
 const saveButton = document.getElementById("save-transaction");
 const cancelEditButton = document.getElementById("cancel-edit");
 const formStatus = document.getElementById("form-status");
-
+// Milestone 12-2：交易進階篩選
+const filterForm = document.getElementById("transaction-filter-form");
+const filterTypeElement = document.getElementById("filter-type");
+const filterCategoryElement = document.getElementById("filter-category");
+const filterSubmitButton = document.getElementById("filter-submit");
+const filterClearButton = document.getElementById("filter-clear");
+const filterStatusElement = document.getElementById("filter-status");
+const filterFromElement = document.getElementById("filter-from");
+const filterToElement = document.getElementById("filter-to");
+const filterMinAmountElement = document.getElementById("filter-min-amount");
+const filterMaxAmountElement = document.getElementById("filter-max-amount");
+const filterKeywordElement = document.getElementById("filter-keyword");
 // 3. 共用狀態
 let allCategories = [];
 let allTransactions = [];
@@ -43,6 +54,17 @@ let isSubmitting = false;
 
 let categoriesReady = false;
 let transactionsLoadFailed = false;
+// Milestone 12-2：進階篩選狀態
+let transactionsReady = false;
+
+// null 代表沒有套用篩選；字串代表已套用的查詢條件
+let appliedFilterQuery = null;
+
+// 只存放符合篩選條件的交易，不覆蓋 allTransactions
+let filteredTransactions = [];
+
+// 區分篩選查詢失敗與真正的零筆結果
+let filterResultsFailed = false;
 
 // 4. 格式化金額
 function formatMoney(amount) {
@@ -101,6 +123,26 @@ function setDeleteStatus(message, status = "normal") {
   }
 }
 
+// Milestone 12-2：顯示篩選狀態
+function setFilterStatus(message, status = "normal") {
+  filterStatusElement.textContent = message;
+
+  filterStatusElement.className =
+    status === "success" || status === "error" ? status : "";
+}
+
+// Milestone 12-2：統一管理篩選表單的可操作狀態
+function updateFilterControls() {
+  const canInteract = categoriesReady && transactionsReady && !isSubmitting;
+
+  for (const field of filterForm.querySelectorAll("input, select")) {
+    field.disabled = !canInteract;
+  }
+
+  filterSubmitButton.disabled = !canInteract;
+  filterClearButton.disabled = !canInteract;
+}
+
 // 9. 更新表單按鈕狀態
 function updateFormControls() {
   const canSubmit =
@@ -108,8 +150,10 @@ function updateFormControls() {
 
   saveButton.disabled = !canSubmit;
   cancelEditButton.disabled = isSubmitting;
-}
 
+  // 讓交易 CRUD 與搜尋操作共用操作鎖
+  updateFilterControls();
+}
 // 10. Dashboard
 function updateDashboard(transactions) {
   const currentMonth = getCurrentMonth();
@@ -153,6 +197,9 @@ function createEmptyRow(message) {
 // 12. 交易清單
 function renderTransactions(transactions) {
   transactionsBody.replaceChildren();
+  const isFiltered = appliedFilterQuery !== null;
+
+  const visibleTransactions = isFiltered ? filteredTransactions : transactions;
 
   // 避免 API 失敗時被錯誤顯示成 0 筆交易
   if (transactionsLoadFailed) {
@@ -162,15 +209,30 @@ function renderTransactions(transactions) {
     return;
   }
 
-  if (transactions.length === 0) {
-    transactionsBody.appendChild(createEmptyRow("目前尚無交易紀錄"));
+  if (isFiltered && filterResultsFailed) {
+    transactionsBody.appendChild(
+      createEmptyRow("篩選結果載入失敗，請重新整理頁面。"),
+    );
 
-    transactionsStatus.textContent = "目前共有 0 筆交易。";
+    transactionsStatus.textContent = "篩選查詢失敗。";
+    return;
+  }
+
+  if (visibleTransactions.length === 0) {
+    transactionsBody.appendChild(
+      createEmptyRow(
+        isFiltered ? "沒有符合篩選條件的交易紀錄" : "目前尚無交易紀錄",
+      ),
+    );
+
+    transactionsStatus.textContent = isFiltered
+      ? "篩選結果：共 0 筆交易。"
+      : "目前共有 0 筆交易。";
 
     return;
   }
 
-  const recentTransactions = transactions.slice(0, 10);
+  const recentTransactions = visibleTransactions.slice(0, 10);
 
   for (const transaction of recentTransactions) {
     const row = document.createElement("tr");
@@ -249,7 +311,9 @@ function renderTransactions(transactions) {
   }
 
   transactionsStatus.textContent =
-    `目前共有 ${transactions.length} 筆交易，` +
+    (isFiltered
+      ? `篩選結果：共 ${visibleTransactions.length} 筆交易，`
+      : `目前共有 ${visibleTransactions.length} 筆交易，`) +
     `顯示最近 ${recentTransactions.length} 筆。`;
 }
 
@@ -272,9 +336,55 @@ async function loadTransactions() {
 
     allTransactions = result.data;
     transactionsLoadFailed = false;
+    transactionsReady = true;
 
+    // Dashboard 永遠使用完整交易資料
     updateDashboard(allTransactions);
+
+    let filterRefreshSucceeded = true;
+
+    // 若有已套用的篩選，CRUD 完成後重新向 API 查詢
+    if (appliedFilterQuery !== null) {
+      try {
+        const filterResponse = await fetch(
+          `/api/transactions?${appliedFilterQuery}`,
+          { cache: "no-store" },
+        );
+
+        const filterResult = await filterResponse.json().catch(() => null);
+
+        if (
+          !filterResponse.ok ||
+          filterResult?.success !== true ||
+          !Array.isArray(filterResult?.data)
+        ) {
+          throw new Error(
+            filterResult?.message || `HTTP ${filterResponse.status}`,
+          );
+        }
+
+        filteredTransactions = filterResult.data;
+        filterResultsFailed = false;
+
+        setFilterStatus(
+          `篩選結果已更新，找到 ${filteredTransactions.length} 筆交易。`,
+          "success",
+        );
+      } catch (error) {
+        console.error("Failed to refresh filtered transactions:", error);
+
+        filterRefreshSucceeded = false;
+        filterResultsFailed = true;
+
+        setFilterStatus(
+          "完整交易已更新，但篩選結果載入失敗，請重新整理頁面。",
+          "error",
+        );
+      }
+    }
+
     renderTransactions(allTransactions);
+    updateFilterControls();
 
     // Milestone 11-1：通知財務分析更新
     document.dispatchEvent(
@@ -285,12 +395,19 @@ async function loadTransactions() {
 
     console.log("Money Tracker transactions loaded:", allTransactions.length);
 
-    return true;
+    // 分別回報完整交易與篩選結果的更新狀態
+    return {
+      transactionsUpdated: true,
+      filterUpdated: filterRefreshSucceeded,
+    };
   } catch (error) {
     console.error("Failed to load transactions:", error);
 
     transactionsLoadFailed = true;
+    transactionsReady = false;
     allTransactions = [];
+
+    updateFilterControls();
 
     incomeElement.textContent = "—";
     expenseElement.textContent = "—";
@@ -303,7 +420,10 @@ async function loadTransactions() {
     transactionsStatus.textContent = `資料讀取失敗：${error.message}`;
     document.dispatchEvent(new Event("moneytracker:transactions-error"));
 
-    return false;
+    return {
+      transactionsUpdated: false,
+      filterUpdated: false,
+    };
   }
 }
 
@@ -349,6 +469,45 @@ function renderCategoryOptions(preferredCategoryId = null) {
   updateFormControls();
 }
 
+// Milestone 12-2：依篩選類型顯示可選擇的分類
+function renderFilterCategoryOptions() {
+  const previousValue = filterCategoryElement.value;
+  const selectedType = filterTypeElement.value;
+
+  // 全部類型：顯示全部分類
+  // 收入或支出：只顯示對應的分類
+  const availableCategories = allCategories.filter(
+    (category) => selectedType === "" || category.type === selectedType,
+  );
+
+  filterCategoryElement.replaceChildren();
+
+  // 第一個選項永遠是「所有分類」
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "所有分類";
+  filterCategoryElement.appendChild(defaultOption);
+
+  for (const category of availableCategories) {
+    const option = document.createElement("option");
+
+    option.value = String(category.id);
+    option.textContent = category.name;
+
+    filterCategoryElement.appendChild(option);
+  }
+
+  // 若原本選擇的分類仍有效，就保留使用者的選擇
+  const previousStillValid = availableCategories.some(
+    (category) => String(category.id) === previousValue,
+  );
+
+  filterCategoryElement.value = previousStillValid ? previousValue : "";
+
+  // 分類 API 尚未成功載入時不可操作
+  filterCategoryElement.disabled = !categoriesReady;
+}
+
 // 15. 載入分類
 async function loadCategories() {
   categoriesReady = false;
@@ -373,6 +532,8 @@ async function loadCategories() {
     categoriesReady = true;
 
     renderCategoryOptions();
+    renderFilterCategoryOptions();
+    setFilterStatus("分類已載入，可設定條件並套用篩選。");
     renderTransactions(allTransactions);
 
     setFormStatus(
@@ -388,6 +549,8 @@ async function loadCategories() {
     categoriesReady = false;
 
     renderCategoryOptions();
+    renderFilterCategoryOptions();
+    setFilterStatus("篩選分類載入失敗，請重新整理頁面。", "error");
     renderTransactions(allTransactions);
 
     setFormStatus(`分類載入失敗：${error.message}。請重新整理頁面。`, "error");
@@ -501,6 +664,185 @@ typeElement.addEventListener("change", () => {
   );
 });
 
+// Milestone 12-2：切換篩選收支類型時更新分類
+filterTypeElement.addEventListener("change", () => {
+  renderFilterCategoryOptions();
+});
+
+// ============================================================
+// Milestone 12-2：交易篩選 API 整合
+// ============================================================
+
+// 1. 套用篩選
+filterForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (isSubmitting || !categoriesReady || !transactionsReady) {
+    return;
+  }
+
+  if (!filterForm.reportValidity()) {
+    return;
+  }
+
+  const values = {
+    from: filterFromElement.value.trim(),
+    to: filterToElement.value.trim(),
+    type: filterTypeElement.value,
+    category_id: filterCategoryElement.value,
+    min_amount: filterMinAmountElement.value.trim(),
+    max_amount: filterMaxAmountElement.value.trim(),
+    keyword: filterKeywordElement.value.trim(),
+  };
+
+  // 日期驗證
+  if (
+    (values.from && !isValidDate(values.from)) ||
+    (values.to && !isValidDate(values.to))
+  ) {
+    setFilterStatus("請輸入有效的日期。", "error");
+    return;
+  }
+
+  if (values.from && values.to && values.from > values.to) {
+    setFilterStatus("開始日期不能晚於結束日期。", "error");
+    return;
+  }
+
+  // 收支類型驗證
+  if (!["", "income", "expense"].includes(values.type)) {
+    setFilterStatus("收支類型不正確。", "error");
+    return;
+  }
+
+  // 分類與收支類型必須相容
+  if (
+    values.category_id &&
+    !allCategories.some(
+      (category) =>
+        String(category.id) === values.category_id &&
+        (!values.type || category.type === values.type),
+    )
+  ) {
+    setFilterStatus("請選擇有效的交易分類。", "error");
+    return;
+  }
+
+  // 金額只能是非負安全整數
+  for (const amountText of [values.min_amount, values.max_amount]) {
+    if (
+      amountText !== "" &&
+      (!/^(0|[1-9]\d*)$/.test(amountText) ||
+        !Number.isSafeInteger(Number(amountText)))
+    ) {
+      setFilterStatus("金額篩選必須是非負安全整數。", "error");
+      return;
+    }
+  }
+
+  if (
+    values.min_amount !== "" &&
+    values.max_amount !== "" &&
+    Number(values.min_amount) > Number(values.max_amount)
+  ) {
+    setFilterStatus("最低金額不能大於最高金額。", "error");
+    return;
+  }
+
+  // 使用 URLSearchParams 安全編碼查詢參數
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(values)) {
+    if (value !== "") {
+      params.set(key, value);
+    }
+  }
+
+  const query = params.toString();
+
+  // 沒有設定條件時，恢復完整交易清單
+  if (query === "") {
+    appliedFilterQuery = null;
+    filteredTransactions = [];
+    filterResultsFailed = false;
+
+    renderTransactions(allTransactions);
+
+    setFilterStatus("沒有設定篩選條件，顯示全部交易。");
+    return;
+  }
+
+  // 搜尋期間鎖定其他交易操作
+  isSubmitting = true;
+
+  updateFormControls();
+  renderTransactions(allTransactions);
+
+  setFilterStatus("正在搜尋符合條件的交易...");
+
+  try {
+    const response = await fetch(`/api/transactions?${query}`, {
+      cache: "no-store",
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (
+      !response.ok ||
+      result?.success !== true ||
+      !Array.isArray(result?.data)
+    ) {
+      throw new Error(result?.message || `HTTP ${response.status}`);
+    }
+
+    // 成功後才更新篩選狀態
+    // allTransactions 保持原樣，避免影響 Dashboard
+    appliedFilterQuery = query;
+    filteredTransactions = result.data;
+    filterResultsFailed = false;
+
+    renderTransactions(allTransactions);
+
+    setFilterStatus(
+      `篩選成功，共找到 ${filteredTransactions.length} 筆交易。`,
+      "success",
+    );
+  } catch (error) {
+    console.error("Failed to filter transactions:", error);
+
+    // 搜尋失敗時，保留上一次成功查詢的結果
+    setFilterStatus(
+      `篩選失敗：${error.message}。原有交易資料未變更。`,
+      "error",
+    );
+  } finally {
+    isSubmitting = false;
+
+    updateFormControls();
+    renderTransactions(allTransactions);
+  }
+});
+
+// 2. 清除篩選條件
+filterClearButton.addEventListener("click", () => {
+  if (isSubmitting) {
+    return;
+  }
+
+  filterForm.reset();
+
+  // 清除分類選擇，重建完整分類選單
+  renderFilterCategoryOptions();
+
+  appliedFilterQuery = null;
+  filteredTransactions = [];
+  filterResultsFailed = false;
+
+  renderTransactions(allTransactions);
+
+  setFilterStatus("已清除篩選條件，恢復顯示全部交易。");
+});
+
 // ============================================================
 // 20. 新增：前端刪除交易
 // ============================================================
@@ -578,19 +920,27 @@ async function deleteTransaction(transactionId) {
     // 刪除成功後重新取得最新 SQLite 資料
     const refreshed = await loadTransactions();
 
-    if (refreshed) {
+    if (refreshed.transactionsUpdated && refreshed.filterUpdated) {
       setDeleteStatus(
-        `交易 ID ${transactionId} 刪除成功！` + "Dashboard 與交易清單已更新。",
+        `交易 ID ${transactionId} 刪除成功！Dashboard 與交易清單已更新。`,
         "success",
       );
-    } else {
-      // DELETE 成功，但 GET 重新載入失敗
+    } else if (refreshed.transactionsUpdated) {
+      // DELETE 已成功，只有篩選結果同步失敗
       setDeleteStatus(
-        `交易 ID ${transactionId} 已收到刪除成功回應，` +
-          "但交易清單重新載入失敗。請重新整理頁面確認。",
+        `交易 ID ${transactionId} 刪除成功，Dashboard 已更新；` +
+          "但篩選清單暫時無法更新，可重新套用篩選或清除條件。",
+        "error",
+      );
+    } else {
+      // DELETE 已成功，但完整交易清單重新載入失敗
+      setDeleteStatus(
+        `交易 ID ${transactionId} 刪除成功，但完整交易清單重新載入失敗。` +
+          "請重新整理頁面核對資料，勿重複刪除。",
         "error",
       );
     }
+
   } catch (error) {
     console.error("Failed to delete transaction:", error);
 
@@ -698,27 +1048,33 @@ transactionForm.addEventListener("submit", async (event) => {
       throw new Error(result?.message || `HTTP ${response.status}`);
     }
 
+    // POST / PUT 已由伺服器確認成功
+    // 先清空新增表單或退出編輯模式，避免重複送出
+    resetToCreateMode();
+
+    const savedLabel =
+      editingId === null
+        ? `交易新增成功！交易 ID：${result.data.id}。`
+        : `交易 ID ${editingId} 修改成功！`;
+
     const refreshed = await loadTransactions();
 
-    if (refreshed) {
-      resetToCreateMode();
-
+    if (refreshed.transactionsUpdated && refreshed.filterUpdated) {
+      setFormStatus(`${savedLabel} Dashboard 與交易清單已更新。`, "success");
+    } else if (refreshed.transactionsUpdated) {
       setFormStatus(
-        editingId === null
-          ? `交易新增成功！交易 ID：${result.data.id}。` +
-              "Dashboard 與交易清單已更新。"
-          : `交易 ID ${editingId} 修改成功！` + "Dashboard 與交易清單已更新。",
-        "success",
+        `${savedLabel} Dashboard 已更新，但篩選清單暫時無法更新。` +
+          "可重新套用篩選或清除條件。",
+        "error",
       );
     } else {
       setFormStatus(
-        editingId === null
-          ? "交易已新增，但清單重新整理失敗。" +
-              "請重新整理頁面確認，避免重複新增。"
-          : "交易修改已儲存，但清單重新整理失敗。" + "請重新整理頁面確認。",
+        `${savedLabel} 完整交易清單重新載入失敗。` +
+          "請重新整理頁面核對，勿重複送出。",
         "error",
       );
     }
+
   } catch (error) {
     console.error("Failed to save transaction:", error);
 
