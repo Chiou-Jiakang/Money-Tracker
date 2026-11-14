@@ -6543,3 +6543,35 @@ CSV 純函式測試：13/13 PASS。
 
 因此可確認本機 MVP 核心功能通過目前驗收範圍，
 但不將其描述為已完成全面產品驗收。
+
+# 三十三、Milestone 15 | v1.0.0 Release Acceptance
+
+## 33.1 測試結果
+
+| 測試項目 | 結果 |
+|---|---|
+| Milestone 14 唯讀驗收 24 項 | PASS |
+| API 正常與異常篩選 18 項 | PASS |
+| CSV 純函式測試 13 項 | PASS |
+| SQLite 完整性與資料一致性 | PASS |
+| 隔離測試環境準備 | PASS |
+| 正式與測試資料隔離 | PASS |
+| 最新完整瀏覽器 E2E | NOT RUN |
+| Excel 實際開啟 CSV | NOT RUN |
+| Google Sheets 實際匯入 CSV | NOT RUN |
+| 大量資料效能驗收 | NOT RUN |
+| 全面安全性驗收 | NOT RUN |
+
+## 33.2 驗收結論
+
+既有核心功能已取得主要測試證據。
+
+Milestone 14 最終唯讀驗收為 24/24 PASS，
+但該數字不是整體測試覆蓋率。
+
+未執行測試不可視為 PASS。
+
+依本機單人 MVP 的發布範圍，
+可進行 v1.0.0 Release 準備。
+
+本結論不代表商用級或全面安全性驗收完成。

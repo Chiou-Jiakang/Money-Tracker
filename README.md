@@ -615,3 +615,39 @@ Milestone 13 已實作 CSV 匯出，並完成全部交易及篩選交易的主�
 `docs/TESTING.md` 第三十二章。
 
 Milestone 14 版本提交與同步狀態以 GitHub 最新 Commit 為準。
+
+## 十二、Milestone 15｜v1.0.0 發布說明
+
+Money Tracker v1.0.0 為單一使用者的本機財務管理 MVP。
+
+主要功能：
+
+- SQLite 交易資料持久化。
+- 完整交易 CRUD。
+- 每月財務總覽及分析。
+- 分類占比及最近六個月收支趨勢。
+- 日期、類型、分類、金額及關鍵字篩選。
+- 全部交易與篩選結果 CSV 匯出。
+- 限制伺服器監聽 127.0.0.1。
+
+首次安裝：
+
+1. 安裝 Node.js 24 與 npm。
+2. 執行 `npm ci`。
+3. 執行 `node server/init-db.js`。
+4. 執行 `npm start`。
+5. 開啟 `http://127.0.0.1:3000`。
+
+已有資料庫的使用者不需要重新初始化。
+請自行備份個人的 SQLite 財務資料。
+
+Milestone 14 最終唯讀驗收：24/24 PASS。
+Milestone 15 隔離測試環境準備：PASS。
+
+完整瀏覽器 E2E、Excel／Google Sheets 實際相容性、
+大量資料效能及全面安全性驗收尚未執行。
+
+本版本不提供多使用者登入功能，
+不應直接部署為公開網路服務。
+
+正式發布狀態與版本下載以 GitHub Releases 為準。

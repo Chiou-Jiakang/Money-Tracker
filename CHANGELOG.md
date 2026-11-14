@@ -4292,3 +4292,33 @@ Milestone 14-2.5 舊 PowerShell 測試程式的計數器曾顯示
 本階段核心唯讀驗收已通過。
 完整產品驗收及正式版本發布仍待決定。
 Milestone 14 版本提交與同步狀態以 GitHub 最新 Commit 為準。
+
+# Milestone 15 | v1.0.0 Release Preparation
+
+## Scope
+
+Money Tracker v1.0.0 為第一個穩定的單人本機 MVP。
+
+本版本包含交易 CRUD、SQLite 持久化、
+財務 Dashboard、Analytics、進階篩選與 CSV 匯出。
+
+## Verified
+
+- Milestone 14 最終唯讀驗收：24/24 PASS。
+- API 篩選與異常測試：18 項逐項 PASS。
+- CSV 純函式檢查：13/13 PASS。
+- Milestone 15 隔離測試環境準備：PASS。
+- 正式及隔離資料庫保持獨立。
+- 本機伺服器監聽限制：127.0.0.1。
+
+## Not Run
+
+- 最新版本完整瀏覽器端對端測試。
+- Excel／Google Sheets 實際匯入驗收。
+- 大量資料效能與完整安全性驗收。
+
+## Release Status
+
+本章記錄 v1.0.0 的發布準備。
+
+正式發布狀態以 GitHub Releases 頁面為準。
