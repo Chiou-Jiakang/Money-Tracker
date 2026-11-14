@@ -4243,3 +4243,52 @@ Milestone 12 已確認 Commit：`8aaf69a`。
 尚未建立正式 Commit 或完成 GitHub Push。
 
 測試通過不代表產品已完成全面驗收。
+
+# Milestone 14 | MVP Final Acceptance & Local Security (Unreleased)
+
+**驗收日期：** 2026-11-15
+**基準 Commit：** `d77ede8`
+
+## Changed
+
+- 將正式 Node.js 伺服器監聽位址限制為 `127.0.0.1`。
+- 限制用途為單一使用者本機服務。
+- 隔離測試伺服器同步使用相同監聽設定。
+- 本階段未變更 SQLite Schema、交易 CRUD 或 CSV 資料格式。
+
+## Verified
+
+- 隔離環境 CRUD 主要整合測試：PASS。
+- API 正常與異常篩選：18/18 個別案例 PASS。
+- CSV 純函式格式及基本公式防護：13/13 PASS。
+- 正式與隔離伺服器監聽位址：127.0.0.1，PASS。
+- 兩個 API 健康檢查：PASS。
+- MVP 最終唯讀整合驗收：24/24 PASS。
+- 正式 SQLite 完整性、外鍵及 API 資料一致性：PASS。
+- 正式交易維持 2 筆，隔離測試交易維持 0 筆。
+
+## Test Record Clarification
+
+Milestone 14-2.5 舊 PowerShell 測試程式的計數器曾顯示
+`0/18 PASS`，但逐項結果均為 PASS。
+
+原因為 PowerShell 變數作用域不一致，
+屬測試腳本計數缺陷，非 API 測試失敗。
+
+本次保留該問題及逐項測試證據，不隱藏歷史結果。
+
+## NOT RUN / Remaining Limitations
+
+- Excel 與 Google Sheets 實際開檔相容性。
+- 最新版本完整瀏覽器端對端驗收。
+- 大量資料效能與長時間運作測試。
+- 多瀏覽器、多裝置相容性。
+- 完整安全性及所有 CSV 公式注入邊界情境。
+
+以上項目不得宣稱已通過。
+
+## Release Status
+
+本階段核心唯讀驗收已通過。
+完整產品驗收及正式版本發布仍待決定。
+Milestone 14 版本提交與同步狀態以 GitHub 最新 Commit 為準。

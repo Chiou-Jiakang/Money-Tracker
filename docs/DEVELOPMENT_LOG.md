@@ -7485,3 +7485,98 @@ Milestone 12 完成進階篩選後，Milestone 13 增加 CSV 匯出，
 本章加入時尚未執行 Milestone 13 Git Commit 或 Push。
 
 下次提交前應再次檢查程式、文件及 Git Staging 範圍。
+
+# 十七、Milestone 14 | MVP Final Acceptance 開發紀錄
+
+**日期：** 2026-11-15
+**開發基準：** `d77ede8`
+
+## 17.1 階段目標
+
+針對既有單人本機 Money Tracker MVP 執行整合驗收，
+降低測試工作對正式交易資料的影響，
+並修正不必要的網路監聽範圍。
+
+## 17.2 測試環境
+
+正式專案：
+
+`C:\Projects\Money-Tracker`
+
+正式 API：`127.0.0.1:3000`
+
+隔離測試專案：
+
+`C:\Projects\Money-Tracker-Backups\M14-Integration-20261114-160711`
+
+隔離 API：`127.0.0.1:3100`
+
+測試期間已確認：
+
+- 正式交易為 2 筆。
+- 隔離交易為 0 筆。
+- 隔離 CRUD 測試已完成新增、修改、查詢及刪除。
+- 隔離環境測試後恢復 0 筆交易。
+
+## 17.3 API 與 CSV 檢查
+
+進階篩選正常及異常案例共 18 項，
+逐項結果皆為 PASS。
+
+原始 PowerShell 計數器曾錯誤輸出 `0/18 PASS`。
+原因是區域變數與 script 作用域混用，
+不是測試案例失敗。
+
+CSV 純函式測試完成 13/13 PASS，
+涵蓋中文、空值、逗號、引號、換行、
+UTF-8 BOM、空資料與基本公式字元防護。
+
+上述結果不等同於 Excel 實際執行相容性驗收。
+
+## 17.4 本機監聽安全性修正
+
+原始伺服器使用：
+
+`app.listen(PORT, () => {`
+
+修改為：
+
+`app.listen(PORT, "127.0.0.1", () => {`
+
+最初測試時舊 Node.js 程序仍佔用連接埠，
+造成監聽位址持續顯示 `::`。
+
+確認並停止舊程序後，重新啟動兩個環境。
+
+實際結果：
+
+- Port 3000：127.0.0.1，PASS。
+- Port 3100：127.0.0.1，PASS。
+- 兩個健康檢查皆回傳 ok。
+
+本階段只修改正式專案 `server/server.js`。
+未修改資料庫結構及既有交易資料。
+
+## 17.5 MVP 最終唯讀驗收
+
+執行工具：
+
+`C:\Projects\Money-Tracker-Backups\M14-Final-Acceptance-ReadOnly.cjs`
+
+實際結果：
+
+`24/24 PASS`
+
+涵蓋 Git、語法、API、篩選、SQLite 完整性、
+外鍵、資料一致性及驗收前後資料不變。
+
+本項為唯讀驗收，不涵蓋所有瀏覽器互動與效能測試。
+
+## 17.6 後續工作
+
+仍需實際驗收 Excel／Google Sheets 匯入、
+完整瀏覽器 E2E、多瀏覽器及效能情境。
+
+正式發布決策須依驗收範圍與未執行項目評估。
+
+本章加入時尚未執行 Milestone 14 Git Commit 或 Push。
