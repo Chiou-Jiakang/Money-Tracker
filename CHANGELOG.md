@@ -38,6 +38,17 @@
 
 ---
 
+# Current Status｜2026-11-14 Milestone 13
+
+- 最新功能：CSV 全部與篩選結果匯出。
+- 本機主要 CSV 驗證：PASS。
+- 完整 Excel 與安全性驗收：尚未完成。
+- 正式提交基準：`8aaf69a`。
+- Milestone 13：文件整理進行中，尚未 Commit。
+- 下方 2026-11-12 Current Status 為歷史快照。
+
+---
+
 # Current Status｜2026-11-12 最新開發狀態
 
 **專案名稱：** Money Tracker
@@ -4175,3 +4186,60 @@ Milestone 12 已完成進階交易篩選與搜尋的主要功能實作，並透�
 目前進入文件整理及版本驗收階段。待必要檢查與版本提交完成後，方可將整個 Milestone 12 標記為正式完成。
 
 本紀錄保留 Milestone 1～11 的歷史開發內容，不以新章節覆蓋既有紀錄。
+
+# Milestone 13 | CSV Export (Unreleased)
+
+**開發日期：** 2026-11-14
+**開發基準：** `8aaf69a`（Milestone 12）
+**版本狀態：** Unreleased；本階段尚未 Commit 或 Push。
+
+## Added | 新增功能
+
+- 新增交易紀錄 CSV 匯出。
+- 支援全部交易匯出。
+- 支援已套用篩選條件的交易匯出。
+- 使用既有 GET /api/transactions API 取得資料。
+- 匯出完整查詢結果，不受畫面顯示筆數限制。
+- CSV 包含交易 ID、日期、類型、分類、金額、備註及建立時間。
+- 使用 UTF-8 BOM、CRLF 換行及標準 CSV 欄位跳脫。
+- 對可能被試算表辨識為公式的文字加入防護處理。
+- 加入匯出狀態與錯誤提示。
+
+## Changed | 修改檔案
+
+- `public/app.js`：CSV 產生、下載及狀態管理。
+- `public/index.html`：新增匯出按鈕及訊息區域。
+- `public/style.css`：新增按鈕與提示樣式。
+
+本階段未修改 SQLite Schema、交易 REST API 或分析模組。
+
+## Verified | 實際驗證
+
+- 三份 JavaScript 語法檢查：PASS。
+- Git Diff 格式檢查：PASS。
+- CSV 按鈕正常顯示：PASS。
+- 全部匯出：2 筆交易，內容正確。
+- 最低金額 NT$170 篩選匯出：1 筆交易，內容正確。
+- 兩份 CSV 的 UTF-8 BOM、CRLF、七欄結構及中文內容解析：PASS。
+- 原有 Dashboard、Analytics 與交易紀錄畫面正常顯示。
+
+## Known Limitations | 未完成驗證
+
+- Excel 實際開啟及不同版本相容性：NOT RUN。
+- 空結果 CSV 下載：NOT RUN。
+- 含逗號、雙引號、換行的特殊輸入：NOT RUN。
+- 試算表公式注入防護的實際驗收：NOT RUN。
+- 大量資料及不同瀏覽器下載驗收：NOT RUN。
+- 匯出前後 SQLite 資料庫直接比對：NOT RUN。
+
+篩選切換後可能短暫保留前一次匯出狀態訊息，
+後續可改善提示訊息的清除時機。
+
+## Version Control
+
+Milestone 12 已確認 Commit：`8aaf69a`。
+
+本章撰寫時 Milestone 13 正在整理文件，
+尚未建立正式 Commit 或完成 GitHub Push。
+
+測試通過不代表產品已完成全面驗收。

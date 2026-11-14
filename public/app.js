@@ -41,6 +41,8 @@ const filterToElement = document.getElementById("filter-to");
 const filterMinAmountElement = document.getElementById("filter-min-amount");
 const filterMaxAmountElement = document.getElementById("filter-max-amount");
 const filterKeywordElement = document.getElementById("filter-keyword");
+const csvExportButton = document.getElementById("export-csv");
+const csvExportStatus = document.getElementById("csv-export-status");
 // 3. 共用狀態
 let allCategories = [];
 let allTransactions = [];
@@ -65,6 +67,7 @@ let filteredTransactions = [];
 
 // 區分篩選查詢失敗與真正的零筆結果
 let filterResultsFailed = false;
+let csvExportBusy = false;
 
 // 4. 格式化金額
 function formatMoney(amount) {
@@ -141,6 +144,7 @@ function updateFilterControls() {
 
   filterSubmitButton.disabled = !canInteract;
   filterClearButton.disabled = !canInteract;
+  csvExportButton.disabled = !canInteract || csvExportBusy;
 }
 
 // 9. 更新表單按鈕狀態
@@ -844,6 +848,152 @@ filterClearButton.addEventListener("click", () => {
 });
 
 // ============================================================
+// ============================================================
+// Milestone 13 | CSV Export
+// 使用既有 GET API，匯出完整或已套用篩選的交易
+// ============================================================
+
+function csvEscape(value) {
+  const text = value === null || value === undefined ? "" : String(value);
+
+  // 避免 Excel / 試算表將文字內容當成公式執行
+  const protectedText = /^[\s\u200B-\u200D\uFEFF]*[=+\-@]/u.test(text)
+    ? `'${text}`
+    : text;
+
+  return `"${protectedText.replace(/"/g, '""')}"`;
+}
+
+function createCsvText(transactions) {
+  const rows = [
+    ["交易ID", "交易日期", "收支類型", "交易分類",
+      "金額(NT$)", "備註", "建立時間"],
+
+    ...transactions.map((transaction) => [
+      transaction.id,
+      transaction.transaction_date,
+      transaction.type === "income" ? "收入" : "支出",
+      transaction.category_name,
+      transaction.amount,
+      transaction.note ?? "",
+      transaction.created_at ?? "",
+    ]),
+  ];
+
+  // UTF-8 BOM + CRLF，改善 Excel 中文匯入相容性
+  return "\uFEFF" +
+    rows.map((row) => row.map(csvEscape).join(",")).join("\r\n") +
+    "\r\n";
+}
+
+function setCsvExportStatus(message, status = "normal") {
+  csvExportStatus.textContent = message;
+  csvExportStatus.className = "csv-export-status";
+
+  if (status === "success" || status === "error") {
+    csvExportStatus.classList.add(status);
+  }
+}
+
+csvExportButton.addEventListener("click", async () => {
+  if (
+    csvExportBusy ||
+    isSubmitting ||
+    !transactionsReady ||
+    transactionsLoadFailed
+  ) {
+    setCsvExportStatus(
+      "資料尚未準備完成，請先確認交易清單已正常載入。",
+      "error",
+    );
+    return;
+  }
+
+  // 使用已套用的篩選，而非使用者尚未提交的表單內容
+  const query = appliedFilterQuery;
+
+  const endpoint = query === null
+    ? "/api/transactions"
+    : `/api/transactions?${query}`;
+
+  csvExportBusy = true;
+  updateFilterControls();
+
+  setCsvExportStatus("正在讀取最新交易並產生 CSV...");
+
+  try {
+    const response = await fetch(endpoint, {
+      cache: "no-store",
+    });
+
+    const result = await response.json().catch(() => null);
+
+    if (
+      !response.ok ||
+      result?.success !== true ||
+      !Array.isArray(result?.data)
+    ) {
+      throw new Error(result?.message || `HTTP ${response.status}`);
+    }
+
+    // 取得全部符合條件的交易，而不是只有畫面上的 10 筆
+    const csvText = createCsvText(result.data);
+
+    const blob = new Blob([csvText], {
+      type: "text/csv;charset=utf-8",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const now = new Date();
+
+    const datePart = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("");
+
+    const timePart = [
+      String(now.getHours()).padStart(2, "0"),
+      String(now.getMinutes()).padStart(2, "0"),
+      String(now.getSeconds()).padStart(2, "0"),
+    ].join("");
+
+    const filename =
+      `money-tracker-${query === null ? "all" : "filtered"}-` +
+      `${datePart}-${timePart}.csv`;
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    // 下載已觸發後釋放暫存 URL
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    const count = result.data.length;
+
+    setCsvExportStatus(
+      `CSV 已建立：${count} 筆交易` +
+        `${count === 0 ? "（只有欄位標題）" : ""}。` +
+        "交易資料未被修改。",
+      "success",
+    );
+  } catch (error) {
+    console.error("CSV export failed:", error);
+
+    setCsvExportStatus(
+      `CSV 匯出失敗：${error.message}。交易資料未被修改。`,
+      "error",
+    );
+  } finally {
+    csvExportBusy = false;
+    updateFilterControls();
+  }
+});
+
 // 20. 新增：前端刪除交易
 // ============================================================
 

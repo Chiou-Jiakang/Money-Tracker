@@ -165,6 +165,23 @@ Milestone 12 新增交易紀錄進階篩選功能，方便使用者依不同條�
 本階段已通過核心 API 測試與唯讀自動化檢查，但最新版完整瀏覽器端對端驗收仍待補充。
 
 
+### 2.8 CSV 交易資料匯出
+
+Milestone 13 新增 CSV 匯出功能。
+
+- 無篩選時匯出全部交易。
+- 已套用篩選時，只匯出符合條件的交易。
+- 匯出完整 API 查詢結果，不受畫面顯示筆數限制。
+- 包含交易 ID、日期、類型、分類、金額、備註及建立時間。
+- 使用 UTF-8 BOM 與 CRLF，提高中文及試算表相容性。
+- 處理 CSV 引號及基本公式風險文字。
+- 提供匯出成功及失敗提示。
+
+匯出功能使用 GET API，不會主動修改 SQLite 交易資料。
+
+已完成全部交易與篩選交易的實際 CSV 內容核對。
+Excel 實際相容性、特殊輸入及安全性測試仍待補充。
+
 ## 三、技術架構
 
 | 層級            | 使用技術                             |
@@ -421,6 +438,19 @@ Milestone 12 擴充 `GET /api/transactions`，支援以下 Query Parameters：
 
 詳細測試證據與 NOT RUN 項目請參閱 `docs/TESTING.md` 的 Milestone 12 章節。
 
+### 6.6 Milestone 13 CSV 匯出驗證
+
+2026-11-14 完成主要 CSV 下載測試。
+
+- 全部匯出：2 筆，PASS。
+- 最低金額 NT$170 篩選匯出：1 筆，PASS。
+- 七欄資料、中文、UTF-8 BOM 與 CRLF：PASS。
+- JavaScript 語法與 Git Diff 檢查：PASS。
+
+完整 Excel 相容性、特殊字元及安全性驗收尚未完成。
+
+詳細案例請參閱 `docs/TESTING.md` 第三十一章。
+
 ## 七、目前開發進度
 
 ### 已完成
@@ -434,12 +464,15 @@ Milestone 12 擴充 `GET /api/transactions`，支援以下 Query Parameters：
 - Milestone 12-1：後端進階交易篩選 API。
 - Milestone 12-2：前端進階篩選搜尋與 CRUD 狀態修正。
 - Milestone 12-3：本機唯讀自動化檢查，20/20 PASS。
+- Milestone 12-4：文件更新及 GitHub 提交。
+- Milestone 13-1～13-2：CSV 核心功能實作。
+- Milestone 13-3：主要 CSV 匯出與內容驗證。
 
 以上代表對應的核心功能或階段工作已完成，不表示所有端對端、相容性與安全性驗收均已通過。
 
-### 進行中
+### 本階段版本管理
 
-**Milestone 12-4：文件整理與版本管理**
+**Milestone 13-4：CSV 匯出文件與版本管理（文件已整理）**
 
 本階段更新的文件包括：
 
@@ -453,7 +486,7 @@ Milestone 12 擴充 `GET /api/transactions`，支援以下 Query Parameters：
 ### 尚未完成
 
 - 最新版本完整的瀏覽器端對端驗收。
-- CSV 資料匯出。
+- CSV 特殊輸入、Excel 相容性及安全性完整驗證。
 - 使用者自訂分類管理。
 - 更完整且可重現的自動化測試。
 - 大量交易資料的效能測試。
@@ -497,12 +530,19 @@ Milestone 11 已完成 Git Commit、Push，並確認本機與 GitHub 遠端版�
 - 唯讀自動化檢查：20/20 PASS
 - 完整瀏覽器端對端驗收：尚未完成
 - 文件整理：已納入本階段更新
-- Milestone 12 Git Commit：請參閱 Git 提交歷史
-- Milestone 12 GitHub 同步：請參閱遠端 main 分支
+- Milestone 12 Git Commit：8aaf69a
+- Milestone 12 GitHub 同步：已確認
 
-正式提交完成前，不預先填寫 Milestone 12 的 Commit ID。
+Milestone 12 已完成提交，Milestone 13 以 8aaf69a 為基準。
 
 本專案 `package.json` 中的版本號 `1.0.0`，不代表已發布正式 GitHub Release。
+
+### Milestone 13 版本狀態
+
+- 開發基準：8aaf69a
+- CSV 主要功能：已實作並通過主要資料驗證
+- 文件整理：已完成
+- Git Commit／Push：以 GitHub main 分支最新提交紀錄為準
 
 ### 文件用途
 
@@ -522,10 +562,10 @@ Milestone 11 已完成 Git Commit、Push，並確認本機與 GitHub 遠端版�
 
 ## 九、後續開發方向
 
-完成 Milestone 12-4 的文件與版本管理後，後續重點包括：
+完成 Milestone 13 文件與版本管理後，後續重點包括：
 
 1. 補充最新版搜尋介面的端對端驗收。
-2. 新增 CSV 資料匯出。
+2. 補充 CSV 相容性、空結果及安全性測試。
 3. 改善篩選操作與使用者介面體驗。
 4. 擴充自動化測試及測試腳本版本管理。
 5. 完善自訂分類管理能力。
@@ -540,6 +580,8 @@ Money Tracker 已完成本機全端架構、SQLite 持久化儲存、交易 CRUD
 
 Milestone 12 已取得本機唯讀自動化檢查 20/20 PASS，並確認當次檢查前後交易資料保持一致。
 
-本階段的程式與文件更新已整理，版本提交及同步結果以 GitHub 紀錄為準。完整瀏覽器端對端驗收、CSV 匯出、系統安全性及正式部署尚未完成。
+Milestone 13 已實作 CSV 匯出，並完成全部交易及篩選交易的主要檔案內容核對。
+
+本階段的程式與文件更新已整理，版本提交及同步結果以 GitHub 紀錄為準。完整瀏覽器端對端驗收、CSV 進階相容性驗證、系統安全性及正式部署尚未完成。
 
 因此，本專案目前仍屬於持續開發中的單人本機財務管理應用程式，而非已完成全面驗收的正式發布產品。
